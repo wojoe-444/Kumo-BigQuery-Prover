@@ -2,7 +2,7 @@
 
 An equivalence prover that assumes BigQuery exclusively. Query pairs are parsed as BigQuery SQL and, when they must be run, executed on the BigQuery emulator. There is no dialect translation and no DuckDB.
 
-Status: skeleton. The static proof layer only recognises identical queries; the emulator can refute a pair with a counterexample; nothing has been run against the emulator yet. See [docs/roadmap.md](docs/roadmap.md).
+Status: skeleton. The static proof layer only recognises identical queries; the emulator can refute a pair with a counterexample. First live run: 5 of 6 non-equivalent synthetic pairs refuted, 0 wrong (see [docs/evals/bq-shapes.md](docs/evals/bq-shapes.md)). See [docs/roadmap.md](docs/roadmap.md).
 
 ```python
 from kumo_bq_prover.emulator import running_emulator

@@ -27,7 +27,7 @@ Not evaluated: Google's reference implementation inside the GoogleSQL repository
 
 - The binary builds from source with `go install` in a cloud container (about three minutes, no cgo).
 - The source of v0.8.1 supports `QUALIFY`, `STRUCT`, `ARRAY`, `UNNEST`, wildcard tables and JavaScript UDFs, and the flags this repository passes (`--project`, `--host`, `--port`, `--grpc-port`) exist.
-- **Not checked: any run of the emulator.** The sandbox the thread ran in refused to execute the downloaded binary, so every live statement is unverified. `tests/test_emulator_live.py` and `tools/run_oracle_eval.py` are written and wait for a first run.
+- First live run (2026-11-11): the three live tests pass and the synthetic corpus scores 5 of 6 refuted, 8 of 8 equivalent pairs left alone, 0 wrong ([docs/evals/bq-shapes.md](evals/bq-shapes.md)). Two gaps surfaced: unary minus is missing, and `LEFT JOIN UNNEST` without `ON` drops the empty-array row (a wrong result). Both are recorded; neither changes the choice.
 
 ## Rules for using the emulator
 

@@ -65,7 +65,8 @@
    "left": "SELECT id, tag FROM orders CROSS JOIN UNNEST(tags) AS tag",
    "right": "SELECT id, tag FROM orders LEFT JOIN UNNEST(tags) AS tag",
    "ordered": false,
-   "note": "needs a row with an empty array: id 3"
+   "note": "needs a row with an empty array: id 3",
+   "confirmed_on_bigquery": "2026-11-11: LEFT JOIN UNNEST with no ON keeps the empty-array row (id, NULL); the emulator drops it"
   },
   {
    "id": "comma-vs-cross-join-unnest",
@@ -194,10 +195,11 @@
    "tables": [
     "orders"
    ],
-   "left": "SELECT -id AS id FROM orders ORDER BY id LIMIT 1",
-   "right": "SELECT -id AS id FROM orders ORDER BY orders.id LIMIT 1",
+   "left": "SELECT 0 - id AS id FROM orders ORDER BY id LIMIT 1",
+   "right": "SELECT 0 - id AS id FROM orders ORDER BY orders.id LIMIT 1",
    "ordered": false,
-   "note": "BigQuery reads the alias in ORDER BY (checked on real BigQuery in an earlier thread); a name-resolution trap"
+   "note": "BigQuery reads the alias in ORDER BY (checked on real BigQuery in an earlier thread); a name-resolution trap; written as 0 - id because the emulator has no unary minus (googlesqlite_unary_minus missing)",
+   "confirmed_on_bigquery": "2026-11-11: alias form returns -4, column form returns -1 on inline data"
   },
   {
    "id": "numeric-literal-coercion",

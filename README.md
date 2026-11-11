@@ -30,4 +30,6 @@ python -m pytest -m emulator                    # live tests, need the binary
 python tools/run_oracle_eval.py                 # score the synthetic corpus
 ```
 
+Which evals to improve this against, in order: [docs/hillclimb-evals.md](docs/hillclimb-evals.md). Pair corpora: `python tools/run_pairs_eval.py documented-rewrites` or `numeric-traps`.
+
 Docs: [docs/README.md](docs/README.md).

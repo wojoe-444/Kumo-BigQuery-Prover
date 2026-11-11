@@ -1,0 +1,12 @@
+{
+  "eval": "pairs-documented-rewrites",
+  "status": "measured",
+  "size": 25,
+  "score": "equivalent: 19 of 19 not refuted; not equivalent: 1 of 6 refuted, 4 missed, 1 invalid in BigQuery",
+  "proved": 0,
+  "wrong": 0,
+  "date": "2026-11-11",
+  "emulator": "goccy/bigquery-emulator v0.8.1",
+  "command": "python tools/run_pairs_eval.py documented-rewrites --databases 8",
+  "caveats": "Refutation only: nothing is proved yet, so the proof side of the KumoSQL record (18 of 19) is not reproduced. 8 seeded random databases per case, tuned on test is not applicable yet because no generator change has been made. The 4 misses need specific values (a mid-year date, a duplicate key, a code prefix) that the random pools lack. One case (R012b-09, `= NULL`) is rejected by real BigQuery."
+}

@@ -1,0 +1,9 @@
+{
+  "eval": "bq-shapes-oracle",
+  "status": "unmeasured",
+  "size": 14,
+  "score": null,
+  "wrong": null,
+  "date": "2026-11-11",
+  "caveats": "Corpus and runner written; the emulator has not been run yet, so there is no score. A score of '0 wrong' will only be recorded after a live run."
+}

@@ -1,0 +1,12 @@
+{
+  "eval": "pairs-numeric-traps",
+  "status": "measured",
+  "size": 112,
+  "score": "equivalent: 61 of 65 not refuted, 1 refuted (emulator bug), 3 emulator errors; not equivalent: 11 of 26 refuted, 14 missed, 1 emulator error; 21 error-class cases unscored",
+  "proved": 0,
+  "wrong": 1,
+  "date": "2026-11-11",
+  "emulator": "goccy/bigquery-emulator v0.8.1",
+  "command": "python tools/run_pairs_eval.py numeric-traps --databases 8",
+  "caveats": "The 1 wrong is the emulator, not the prover: it returns 2 for CAST(2.5 AS INT64) where real BigQuery returns 3 (checked on real BigQuery). Two label problems found against real BigQuery: NUMERIC literals with ten decimals are rejected, so numeric-literal-rounding and numeric-literal-below-half are not valid BigQuery. Refutation only; 8 seeded random databases plus the case's witness rows when it has one."
+}

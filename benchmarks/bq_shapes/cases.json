@@ -1,0 +1,220 @@
+{
+ "description": "Synthetic BigQuery-shaped query pairs. Labels are the authors' reading of BigQuery semantics, not yet confirmed on the emulator.",
+ "tables": {
+  "orders": "CREATE TABLE orders AS SELECT * FROM UNNEST([STRUCT(1 AS id, 'a' AS customer, NUMERIC '10.50' AS amount, TIMESTAMP '2024-01-01 00:00:00+00' AS ts, ['x','y'] AS tags, STRUCT('Oslo' AS city, '0150' AS zip) AS addr), STRUCT(2, 'a', NUMERIC '20.00', TIMESTAMP '2024-01-02 00:00:00+00', ['y'], STRUCT('Oslo', '0150')), STRUCT(3, 'b', CAST(NULL AS NUMERIC), TIMESTAMP '2024-01-02 00:00:00+00', CAST([] AS ARRAY<STRING>), STRUCT('Bergen', '5003')), STRUCT(4, 'b', NUMERIC '5.00', TIMESTAMP '2024-01-02 00:00:00+00', ['z'], STRUCT('Bergen', '5003'))])",
+  "target": "CREATE TABLE target AS SELECT TIMESTAMP '2024-01-02 00:00:00+00' AS ts",
+  "t1": "CREATE TABLE t1 AS SELECT x FROM UNNEST([1, 2, 3]) AS x",
+  "t2": "CREATE TABLE t2 AS SELECT y FROM UNNEST([1, CAST(NULL AS INT64)]) AS y",
+  "nums": "CREATE TABLE nums AS SELECT n FROM UNNEST([NUMERIC '0.1', NUMERIC '0.2']) AS n"
+ },
+ "cases": [
+  {
+   "id": "qualify-vs-subquery",
+   "shapes": [
+    "QUALIFY",
+    "window"
+   ],
+   "label": "equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT id, customer, amount FROM orders QUALIFY ROW_NUMBER() OVER (PARTITION BY customer ORDER BY ts DESC, id) = 1",
+   "right": "SELECT id, customer, amount FROM (SELECT id, customer, amount, ROW_NUMBER() OVER (PARTITION BY customer ORDER BY ts DESC, id) AS rn FROM orders) WHERE rn = 1",
+   "ordered": false,
+   "note": ""
+  },
+  {
+   "id": "qualify-rank-vs-row-number",
+   "shapes": [
+    "QUALIFY",
+    "window"
+   ],
+   "label": "not_equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT id, customer FROM orders QUALIFY RANK() OVER (PARTITION BY customer ORDER BY ts DESC) = 1",
+   "right": "SELECT id, customer FROM orders QUALIFY ROW_NUMBER() OVER (PARTITION BY customer ORDER BY ts DESC, id) = 1",
+   "ordered": false,
+   "note": "needs a tie on ts within a customer: customer b has one"
+  },
+  {
+   "id": "cte-stack-vs-nested",
+   "shapes": [
+    "CTE"
+   ],
+   "label": "equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "WITH big AS (SELECT * FROM orders WHERE amount > 6), named AS (SELECT id, customer FROM big) SELECT customer, COUNT(*) AS n FROM named GROUP BY customer",
+   "right": "SELECT customer, COUNT(*) AS n FROM (SELECT id, customer FROM (SELECT * FROM orders WHERE amount > 6)) GROUP BY customer",
+   "ordered": false,
+   "note": ""
+  },
+  {
+   "id": "cross-vs-left-join-unnest",
+   "shapes": [
+    "ARRAY",
+    "UNNEST"
+   ],
+   "label": "not_equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT id, tag FROM orders CROSS JOIN UNNEST(tags) AS tag",
+   "right": "SELECT id, tag FROM orders LEFT JOIN UNNEST(tags) AS tag",
+   "ordered": false,
+   "note": "needs a row with an empty array: id 3",
+   "confirmed_on_bigquery": "2026-11-11: LEFT JOIN UNNEST with no ON keeps the empty-array row (id, NULL); the emulator drops it"
+  },
+  {
+   "id": "comma-vs-cross-join-unnest",
+   "shapes": [
+    "ARRAY",
+    "UNNEST"
+   ],
+   "label": "equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT id, tag FROM orders, UNNEST(tags) AS tag",
+   "right": "SELECT id, tag FROM orders CROSS JOIN UNNEST(tags) AS tag",
+   "ordered": false,
+   "note": ""
+  },
+  {
+   "id": "struct-field-qualified",
+   "shapes": [
+    "STRUCT"
+   ],
+   "label": "equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT addr.city AS city, addr.zip AS zip FROM orders",
+   "right": "SELECT t.addr.city AS city, t.addr.zip AS zip FROM orders AS t",
+   "ordered": false,
+   "note": ""
+  },
+  {
+   "id": "struct-column-vs-fields",
+   "shapes": [
+    "STRUCT"
+   ],
+   "label": "equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT addr FROM orders",
+   "right": "SELECT STRUCT(addr.city AS city, addr.zip AS zip) AS addr FROM orders",
+   "ordered": false,
+   "note": ""
+  },
+  {
+   "id": "incremental-gt-vs-gte",
+   "shapes": [
+    "incremental"
+   ],
+   "label": "not_equivalent",
+   "tables": [
+    "orders",
+    "target"
+   ],
+   "left": "SELECT id FROM orders WHERE ts > (SELECT MAX(ts) FROM target)",
+   "right": "SELECT id FROM orders WHERE ts >= (SELECT MAX(ts) FROM target)",
+   "ordered": false,
+   "note": "needs a row whose ts equals the target's max"
+  },
+  {
+   "id": "count-star-vs-count-one",
+   "shapes": [
+    "aggregate"
+   ],
+   "label": "equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT customer, COUNT(*) AS n FROM orders GROUP BY customer",
+   "right": "SELECT customer, COUNT(1) AS n FROM orders GROUP BY customer",
+   "ordered": false,
+   "note": ""
+  },
+  {
+   "id": "count-star-vs-count-column",
+   "shapes": [
+    "aggregate",
+    "NULL"
+   ],
+   "label": "not_equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT customer, COUNT(*) AS n FROM orders GROUP BY customer",
+   "right": "SELECT customer, COUNT(amount) AS n FROM orders GROUP BY customer",
+   "ordered": false,
+   "note": "needs a NULL amount: id 3"
+  },
+  {
+   "id": "not-in-vs-not-exists",
+   "shapes": [
+    "NULL",
+    "subquery"
+   ],
+   "label": "not_equivalent",
+   "tables": [
+    "t1",
+    "t2"
+   ],
+   "left": "SELECT x FROM t1 WHERE x NOT IN (SELECT y FROM t2)",
+   "right": "SELECT x FROM t1 WHERE NOT EXISTS (SELECT 1 FROM t2 WHERE t2.y = t1.x)",
+   "ordered": false,
+   "note": "NOT IN over a NULL returns no rows"
+  },
+  {
+   "id": "ifnull-vs-coalesce",
+   "shapes": [
+    "NULL"
+   ],
+   "label": "equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT id, IFNULL(amount, 0) AS a FROM orders",
+   "right": "SELECT id, COALESCE(amount, 0) AS a FROM orders",
+   "ordered": false,
+   "note": ""
+  },
+  {
+   "id": "order-by-alias-vs-column",
+   "shapes": [
+    "alias-scope",
+    "ORDER BY"
+   ],
+   "label": "not_equivalent",
+   "tables": [
+    "orders"
+   ],
+   "left": "SELECT 0 - id AS id FROM orders ORDER BY id LIMIT 1",
+   "right": "SELECT 0 - id AS id FROM orders ORDER BY orders.id LIMIT 1",
+   "ordered": false,
+   "note": "BigQuery reads the alias in ORDER BY (checked on real BigQuery in an earlier thread); a name-resolution trap; written as 0 - id because the emulator has no unary minus (googlesqlite_unary_minus missing)",
+   "confirmed_on_bigquery": "2026-11-11: alias form returns -4, column form returns -1 on inline data"
+  },
+  {
+   "id": "numeric-literal-coercion",
+   "shapes": [
+    "literal-coercion",
+    "NUMERIC"
+   ],
+   "label": "equivalent",
+   "tables": [
+    "nums"
+   ],
+   "left": "SELECT n FROM nums WHERE n = 0.1",
+   "right": "SELECT n FROM nums WHERE n = NUMERIC '0.1'",
+   "ordered": false,
+   "note": "a decimal literal next to a NUMERIC column becomes NUMERIC in BigQuery (checked on real BigQuery in an earlier thread); a fidelity trap for the emulator"
+  }
+ ]
+}

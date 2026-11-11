@@ -1,0 +1,11 @@
+{
+  "eval": "bq-shapes-oracle",
+  "status": "measured",
+  "size": 14,
+  "score": "5 of 6 not-equivalent pairs refuted; 8 of 8 equivalent pairs not refuted",
+  "wrong": 0,
+  "emulator_errors": 0,
+  "date": "2026-11-11",
+  "emulator": "goccy/bigquery-emulator v0.8.1",
+  "caveats": "Development set, no held-out split; labels are the authors' reading of BigQuery semantics (the two disputed ones were confirmed on real BigQuery with inline values). The one miss is an emulator gap: LEFT JOIN UNNEST without ON drops the empty-array row. The first run failed on unary minus (no googlesqlite_unary_minus), so the alias-scope case is written as 0 - id."
+}

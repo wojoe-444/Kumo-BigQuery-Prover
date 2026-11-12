@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from .emulator import Client, EmulatorUnavailable, QueryError
-from .trust import untrusted_reasons
+from .trust import Adjudication, adjudicate
 from .values import same_rows
 from .verdict import Verdict
 
@@ -47,26 +47,37 @@ def compare(
     reports every difference as REFUTED (for measuring how often the guard fires).
     """
     setup = list(setup or [])
+    adjudication = None
     try:
         with client.scratch_dataset() as dataset:
             for statement in setup:
                 client.query(statement, dataset)
             left = client.query(left_sql, dataset)
             right = client.query(right_sql, dataset)
+            if trust and not same_rows(left.rows, right.rows, ordered=ordered):
+                adjudication = adjudicate(lambda sql: client.query(sql, dataset).rows, left_sql, right_sql, setup, left.rows, right.rows)
     except QueryError as error:
         return OracleResult(Verdict.UNKNOWN, f"emulator rejected a statement: {error}")
     except EmulatorUnavailable as error:
         return OracleResult(Verdict.UNKNOWN, f"emulator unavailable: {error}")
     if same_rows(left.rows, right.rows, ordered=ordered):
         return OracleResult(Verdict.UNKNOWN, "agree on the built data (not a proof)")
-    reasons = untrusted_reasons(left_sql, right_sql, setup, left.rows, right.rows) if trust else []
-    if reasons:
+    if adjudication is not None and not adjudication.trusted:
         return OracleResult(
             Verdict.UNKNOWN,
-            "different rows on the built data, but the emulator is not trusted here: " + ", ".join(reasons),
+            "different rows on the built data, but the emulator is not trusted here: " + ", ".join(adjudication.reasons),
             left_rows=left.rows,
             right_rows=right.rows,
-            untrusted=reasons,
+            untrusted=adjudication.reasons,
+        )
+    if adjudication is not None and adjudication.rewritten:
+        # Counterexample from the queries written without IN / BETWEEN / IS TRUE: those are BigQuery's rows.
+        return OracleResult(
+            Verdict.REFUTED,
+            "different rows on the built data (checked with IN, BETWEEN and IS TRUE written as plain operators)",
+            setup=setup,
+            left_rows=adjudication.left_rows,
+            right_rows=adjudication.right_rows,
         )
     return OracleResult(
         Verdict.REFUTED,

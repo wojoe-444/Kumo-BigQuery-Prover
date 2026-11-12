@@ -66,9 +66,9 @@ def test_a_difference_on_trusted_ground_is_refuted():
 
 
 def test_a_difference_on_a_known_divergence_is_unknown_with_the_reason():
-    result = compare(FakeClient([(2,)], [(3,)]), "SELECT CAST(f AS INT64) FROM t", "SELECT 3 FROM t", setup=["SETUP"])
+    result = compare(FakeClient([(2,)], [(3,)]), "SELECT CAST(f AS NUMERIC) FROM t", "SELECT 3 FROM t", setup=["SETUP"])
     assert result.verdict is Verdict.UNKNOWN
-    assert "cast:INT64" in result.untrusted and "not trusted" in result.reason
+    assert "cast:NUMERIC" in result.untrusted and "not trusted" in result.reason
     assert result.left_rows == [(2,)]  # the emulator's rows stay available for diagnosis
 
 
@@ -78,5 +78,5 @@ def test_a_difference_built_from_extreme_values_is_unknown():
 
 
 def test_the_guard_can_be_switched_off_to_measure_it():
-    result = compare(FakeClient([(2,)], [(3,)]), "SELECT CAST(f AS INT64) FROM t", "SELECT 3 FROM t", setup=["SETUP"], trust=False)
+    result = compare(FakeClient([(2,)], [(3,)]), "SELECT CAST(f AS NUMERIC) FROM t", "SELECT 3 FROM t", setup=["SETUP"], trust=False)
     assert result.verdict is Verdict.REFUTED

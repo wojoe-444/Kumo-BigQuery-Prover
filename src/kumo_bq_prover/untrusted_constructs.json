@@ -16,9 +16,9 @@
   },
   "cast:INT64": {
    "bad": 2,
-   "errors": 325,
+   "errors": 58,
    "examples": [],
-   "ok": 35,
+   "ok": 20,
    "reason": "CAST(FLOAT64 AS INT64) truncates on the emulator; BigQuery rounds half away from zero"
   },
   "cast:NUMERIC": {
@@ -97,6 +97,38 @@
    "ok": 9,
    "reason": "9 of 18 compliance cases using it disagree with the reference"
   },
+  "date_diff:ISOWEEK": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "DATE_DIFF(..., ISOWEEK) counts the wrong number of ISO weeks on the emulator"
+  },
+  "date_diff:WEEKDAY": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "DATE_DIFF(..., WEEK(<weekday>)) was not checked on BigQuery"
+  },
+  "extract:MICROSECOND": {
+   "bad": 3,
+   "errors": 0,
+   "examples": [
+    "interval/justify_days",
+    "interval/justify_hours",
+    "interval/justify_interval"
+   ],
+   "ok": 0,
+   "reason": "3 of 3 compliance cases using it disagree with the reference"
+  },
+  "extract:WEEK": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "EXTRACT(WEEK ...) numbers weeks differently (2016-01-21 is week 3 on BigQuery, 2 on the emulator)"
+  },
   "fn:ASCII": {
    "bad": 2,
    "errors": 0,
@@ -119,6 +151,34 @@
    "ok": 24,
    "reason": "9 of 33 compliance cases using it disagree with the reference"
   },
+  "fn:CURRENT_DATE": {
+   "bad": 1,
+   "errors": 1,
+   "examples": [],
+   "ok": 2,
+   "reason": "the two queries run at different moments, so they can differ without being inequivalent"
+  },
+  "fn:CURRENT_DATETIME": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "the two queries run at different moments, so they can differ without being inequivalent"
+  },
+  "fn:CURRENT_TIME": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "the two queries run at different moments, so they can differ without being inequivalent"
+  },
+  "fn:CURRENT_TIMESTAMP": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "the two queries run at different moments, so they can differ without being inequivalent"
+  },
   "fn:DATE_FROM_UNIX_DATE": {
    "bad": 3,
    "errors": 0,
@@ -126,17 +186,6 @@
     "date/current_date_1",
     "date/date_boundaries_back_and_forth",
     "date/date_from_unix_date_1"
-   ],
-   "ok": 0,
-   "reason": "3 of 3 compliance cases using it disagree with the reference"
-  },
-  "fn:EXTRACT": {
-   "bad": 3,
-   "errors": 2,
-   "examples": [
-    "interval/justify_days",
-    "interval/justify_hours",
-    "interval/justify_interval"
    ],
    "ok": 0,
    "reason": "3 of 3 compliance cases using it disagree with the reference"
@@ -189,6 +238,14 @@
    "ok": 3,
    "reason": "NaN and infinity results cannot be held (NaN reads back as NULL)"
   },
+  "fn:INSTR": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "INSTR counts bytes, not characters, in non-ASCII text on the emulator",
+   "when": "non-ascii"
+  },
   "fn:IS_INF": {
    "bad": 0,
    "errors": 0,
@@ -222,6 +279,34 @@
    ],
    "ok": 0,
    "reason": "2 of 2 compliance cases using it disagree with the reference"
+  },
+  "fn:JUSTIFY_DAYS": {
+   "bad": 1,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "EXTRACT from the result of an interval function differs on the emulator"
+  },
+  "fn:JUSTIFY_HOURS": {
+   "bad": 1,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "EXTRACT from the result of an interval function differs on the emulator"
+  },
+  "fn:JUSTIFY_INTERVAL": {
+   "bad": 1,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "EXTRACT from the result of an interval function differs on the emulator"
+  },
+  "fn:MAKE_INTERVAL": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 2,
+   "reason": "intervals differ on the emulator"
   },
   "fn:PERCENTILE_CONT": {
    "bad": 4,
@@ -319,6 +404,14 @@
    "ok": 4,
    "reason": "5 of 9 compliance cases using it disagree with the reference"
   },
+  "fn:STR_POSITION": {
+   "bad": 1,
+   "errors": 0,
+   "examples": [],
+   "ok": 3,
+   "reason": "STRPOS counts bytes, not characters, in non-ASCII text on the emulator",
+   "when": "non-ascii"
+  },
   "fn:SUBSTRING": {
    "bad": 4,
    "errors": 0,
@@ -329,7 +422,8 @@
     "strings/diff_strings_and_bytes_6"
    ],
    "ok": 5,
-   "reason": "4 of 9 compliance cases using it disagree with the reference"
+   "reason": "SUBSTR counts bytes, not characters, in non-ASCII text on the emulator",
+   "when": "non-ascii"
   },
   "fn:TRIM": {
    "bad": 3,
@@ -341,6 +435,20 @@
    ],
    "ok": 5,
    "reason": "3 of 8 compliance cases using it disagree with the reference"
+  },
+  "fn:UUID": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "GENERATE_UUID differs on every call"
+  },
+  "format:unverified": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "FORMAT_DATE / FORMAT_TIMESTAMP with a directive not checked on BigQuery (%j and %e do not pad, %U %W %w %g %z %E*S differ) or a format that is not a literal"
   },
   "is:boolean": {
    "bad": 2,
@@ -362,6 +470,26 @@
    ],
    "ok": 3,
    "reason": "LEFT JOIN UNNEST drops the row of an empty array on the emulator"
+  },
+  "like:plain": {
+   "bad": 1,
+   "errors": 0,
+   "examples": [],
+   "ok": 8,
+   "reason": "a LIKE pattern with % does not match across a newline on the emulator, and `_` does not match one",
+   "when": "newline"
+  },
+  "like:wild": {
+   "bad": 12,
+   "errors": 16,
+   "examples": [
+    "like_all/like_all_bytes_constant_patterns",
+    "like_all/like_all_bytes_nonconstant_patterns",
+    "like_all/like_all_bytes_with_underscore",
+    "like_all/like_all_string_with_escaped_wildcards"
+   ],
+   "ok": 14,
+   "reason": "LIKE with `_`, an escape or a pattern that is not a literal: `'a' LIKE '_'` is FALSE on the emulator"
   },
   "node:All": {
    "bad": 5,
@@ -386,6 +514,13 @@
    ],
    "ok": 8,
    "reason": "7 of 15 compliance cases using it disagree with the reference"
+  },
+  "node:AtTimeZone": {
+   "bad": 0,
+   "errors": 0,
+   "examples": [],
+   "ok": 0,
+   "reason": "time zone conversions were not checked on BigQuery (the emulator cannot set a zone and rejects no invalid one)"
   },
   "node:Between": {
    "bad": 0,
@@ -436,18 +571,6 @@
    ],
    "ok": 6,
    "reason": "8 of 14 compliance cases using it disagree with the reference"
-  },
-  "node:Like": {
-   "bad": 13,
-   "errors": 16,
-   "examples": [
-    "like_all/like_all_bytes_constant_patterns",
-    "like_all/like_all_bytes_nonconstant_patterns",
-    "like_all/like_all_bytes_with_underscore",
-    "like_all/like_all_string_with_escaped_wildcards"
-   ],
-   "ok": 22,
-   "reason": "13 of 35 compliance cases using it disagree with the reference"
   },
   "node:RawString": {
    "bad": 2,

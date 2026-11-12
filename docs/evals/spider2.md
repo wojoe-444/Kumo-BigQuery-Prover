@@ -47,31 +47,49 @@ The builder sees two readings of `events`, so two kinds of row: one with `kind =
 
 Results: `benchmarks/results/spider2-pairs.json` (summary), `spider2-pairs-dev.json` and `spider2-pairs-held-out.json` (per query); the pairs are in `benchmarks/pairs/spider2-bigquery-dev.jsonl` and `-held-out.jsonl`. emulator v0.8.1, 20 databases per query.
 
-Each cell is the recorded run before this builder, then after. Development: 112 queries; held out: 30. The recorded numbers come from the pair files and the per-query files named above.
+Each cell is the recorded run before the filter-satisfying data builder, then after it, and for the mutation rows a third figure after the trust guard was narrowed ([below](#the-trust-guard-narrowed)). The row counts are from the same databases; the guard decides what the emulator's differences count for. Development: 112 queries; held out: 30. The recorded numbers come from the pair files and the per-query files named above.
 
 | | Development | Held out |
 |---|---|---|
 | Queries | 112 | 30 |
 | Run on the emulator | 80 | 23 |
-| Of those, return rows on some database | 49 → 75 | 13 → 22 |
+| Of those, return rows on some database | 49 → 74 | 13 → 22 |
 | Pairs | 1,031 | 311 |
 | Rewrites (equivalent by construction) | 397 | 127 |
 | Rewrites refuted by the oracle | 0 | 0 |
 | Rewrites proved by the static layers | 110 | 57 |
-| Rewrites on a query that never returns rows | 170 → 27 | 59 → 5 |
+| Rewrites on a query that never returns rows | 170 → 33 | 59 → 5 |
 | Proved rewrites on a query that returns rows | 74 → 107 | 36 → 56 |
 | Mutations | 634 | 184 |
-| Mutations refuted, `not_equivalent` with a witness | 123 → 141 | 25 → 27 |
-| Mutations whose difference the trust guard withheld | 167 → 265 | 58 → 104 |
-| Mutations that agreed on every database | 308 → 201 | 96 → 48 |
+| Mutations refuted, `not_equivalent` with a witness | 123 → 141 → 371 | 25 → 27 → 119 |
+| Mutations whose difference the trust guard withheld | 167 → 265 → 34 | 58 → 104 → 12 |
+| Mutations that agreed on every database | 308 → 201 → 202 | 96 → 48 → 48 |
 | Pairs proved although the emulator refuted them | 0 | 0 |
-| Databases (of 20 per query) on which the original returns rows, all queries | 654 → 1,154 | 155 → 338 |
+| Databases (of 20 per query) on which the original returns rows, all queries | 654 → 1,154 → 1,146 | 155 → 338 → 337 |
 
 The static layers proved rewrites mostly of the wrapper kinds (CTE rename, CTE wrap) and of operand order; on the development split 107 of the 110 proofs are now on queries that return rows (74 before: the others were proofs of nothing). The proof layers are what this corpus is for: 287 of 397 development rewrites are still unproved, and each is equivalent by construction. The static verdicts were re-scored against the static layers on `main` after the runs: the current layers no longer prove one development pair (`bq430-06`, `COALESCE` written as `IFNULL`; 111 proofs before the re-score), and no other verdict changed.
 
 **The builder was made on the development split only.** The held-out file was regenerated once with the final code. No held-out query was read for this work; the exposure recorded before (`bq001`, `bq004`) is unchanged.
 
-**Still empty (development, 5 of 80):** `bq031` (the emulator crashes on the query with a nil pointer, whatever the data), `bq397` (the schema guess reads CTE column names as table columns), `bq045` (compares two counts of different tables against each other), `ga010` (the channel depends on strings inside an aggregate over an array subquery) and `ga028` (not diagnosed). Held out: one query (`bq302`), not looked at.
+**Still empty (development, 6 of 80):** `bq430` (returned rows on one database in the previous run and on none in this one; the builder is not deterministic under load), `bq031` (the emulator crashes on the query with a nil pointer, whatever the data), `bq397` (the schema guess reads CTE column names as table columns), `bq045` (compares two counts of different tables against each other), `ga010` (the channel depends on strings inside an aggregate over an array subquery) and `ga028` (not diagnosed). Held out: one query (`bq302`), not looked at.
+
+## The trust guard narrowed
+
+**Purpose:** the guard of [emulator-gaps.md](../emulator-gaps.md) turned a difference into `unlabelled` whenever a query used `BETWEEN`, `IN`, `EXTRACT`, `LIKE`, `SUBSTR` and the like, although the emulator is wrong only for a particular value or part of each. On this corpus it withheld 265 development and 104 held-out differences, more than it let through. It now fires only when the witness reaches the gap.
+
+**Example:** a gold query that filters `year BETWEEN 2010 AND 2016` and its mutation that adds `DISTINCT` was withheld because of the `BETWEEN`. No bound is NULL, so the emulator is right. With the `BETWEEN` written as `year >= 2010 AND year <= 2016` the pair still differs (three rows against two), and real BigQuery returns the same rows, so the pair is now refuted with that witness.
+
+| | Development | Held out |
+|---|---|---|
+| Mutations refuted before / after | 141 / 371 | 27 / 119 |
+| Of the 230 and 92 newly refuted: refuted only after the `IN`, `BETWEEN`, `IS TRUE` or `CAST` rewrite check | 156 | 60 |
+| Differences still withheld | 265 → 34 | 104 → 12 |
+| Reasons given for the 34 and 12 (a pair can have several) | `IN` 10 and `BETWEEN` 9 (not rewritable, or the rewritten pair agrees), `CAST` to INT64 14, `LEFT JOIN UNNEST` 8, integers from 2^53 6, `CORR` 5, `FORMAT` 4, `EXTRACT(WEEK)` 3 | `IN` 12, `CORR` 5 |
+| Rewrites refuted, false proofs | 0, 0 | 0, 0 |
+
+The held-out half was run once, with the final code, after the guard was fixed on development and on real BigQuery; no held-out pair was read to design it (the nine replayed witnesses were chosen after the run). The compliance failures of `EXTRACT`, `LIKE` and `SUBSTR` on both splits were read when the gap list was written, so for the compliance eval those tags are tuned on test.
+
+**Replayed on real BigQuery.** The smallest newly refuted witness of each construct (six development and three held-out, the smallest of each construct: `BETWEEN` with `EXTRACT`, `IN`, `CAST`, `IS TRUE`, `LIKE` and `SUBSTR`; one more `BETWEEN` witness was left out because its `NTILE` runs over ties and BigQuery does not fix their order) was turned into one query with the data inlined (`python tools/witness_to_bigquery.py benchmarks/pairs/spider2-bigquery-dev.jsonl bq077-12`, 0 bytes billed). All nine differ on BigQuery, as they did on the emulator. The other 313 were not replayed.
 
 ## What does not run (development)
 
@@ -80,8 +98,8 @@ The static layers proved rewrites mostly of the wrapper kinds (CTE rename, CTE w
 ## Limits
 
 - **The data are synthetic and the schemas are guesses.** A column typed `INT64` that runs may be a `STRING` in the real table. Nothing was executed on the public tables.
-- **A few runnable queries still return nothing** (5 of 80 development queries, 1 of 23 held out, listed above), and rows are not the same as interesting rows: a query can return one row on built data and still miss the branch a rewrite changes. The builder satisfies filters; it does not aim at the constructs a rewrite touches.
+- **A few runnable queries still return nothing** (6 of 80 development queries, 1 of 23 held out, listed above), and rows are not the same as interesting rows: a query can return one row on built data and still miss the branch a rewrite changes. The builder satisfies filters; it does not aim at the constructs a rewrite touches.
 - **Rewrites are equivalent by construction, not proved.** Each is a textbook identity, but nothing here checks that the rule was applied correctly except the oracle and the static layers. A query with a `LIMIT` over tied rows can differ between two equivalent spellings; none did.
-- **A mutation's label comes from the emulator.** The trust guard (`node:Between`, `node:In`, `fn:EXTRACT`, `node:Like` are the constructs that withheld most) now withholds 265 development differences (167 before the builder reached more rows), more than the 141 it lets through. A better emulator or a real-BigQuery check on those witnesses is the largest lever left on this corpus. `unlabelled` is not "equivalent".
+- **A mutation's label comes from the emulator.** The trust guard now withholds 34 development and 12 held-out differences (it withheld 265 and 104 before it was narrowed), and lets 371 and 119 through. A refutation is the emulator's answer checked by the guard and, for 9 witnesses, by BigQuery; the rest rest on the emulator being right for everything except the gaps in [emulator-gaps.md](../emulator-gaps.md). `unlabelled` is not "equivalent".
 - **Static proofs run without a schema** (the proof layers take flat types and these schemas are nested), so they work from the queries as written.
 - Results are compared as multisets, so a difference only in row order is not seen.

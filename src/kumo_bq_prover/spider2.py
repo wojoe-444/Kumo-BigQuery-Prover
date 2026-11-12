@@ -31,7 +31,7 @@ from .emulator import Client, EmulatorUnavailable, QueryError
 from .harvest import harvest
 from .schema_infer import Prepared, Unsupported, prepare, type_sql
 from .static import prove_static_detailed
-from .trust import untrusted_reasons
+from .trust import adjudicate
 from .values import same_rows
 from .verdict import Verdict
 
@@ -175,20 +175,25 @@ def run_query(
                     if not same_rows(base.rows, other.rows):
                         # The emulator is not BigQuery: a difference involving a construct or value the
                         # compliance run showed it getting wrong is not a counterexample (see trust.py).
-                        reasons = untrusted_reasons(prepared.sql, variant.sql, setup, base.rows, other.rows)
-                        if reasons:
-                            for reason in reasons:
+                        verdict = adjudicate(
+                            lambda sql: client.query(sql, dataset).rows, prepared.sql, variant.sql, setup, base.rows, other.rows
+                        )
+                        if not verdict.trusted:
+                            for reason in verdict.reasons:
                                 stat["untrusted"][reason] = stat["untrusted"].get(reason, 0) + 1
                             continue
                         stat["differ"] += 1
+                        stat["rewritten"] = stat.get("rewritten", 0) + bool(verdict.rewritten)
                         if stat["witness"] is None:
                             stat["witness"] = {
                                 "setup": setup,
-                                "left_rows": [list(map(_plain, r)) for r in base.rows[:WITNESS_ROWS]],
-                                "right_rows": [list(map(_plain, r)) for r in other.rows[:WITNESS_ROWS]],
-                                "left_row_count": len(base.rows),
-                                "right_row_count": len(other.rows),
+                                "left_rows": [list(map(_plain, r)) for r in verdict.left_rows[:WITNESS_ROWS]],
+                                "right_rows": [list(map(_plain, r)) for r in verdict.right_rows[:WITNESS_ROWS]],
+                                "left_row_count": len(verdict.left_rows),
+                                "right_row_count": len(verdict.right_rows),
                             }
+                            if verdict.rewritten:
+                                stat["witness"]["checked_with_rewritten_queries"] = True
         except EmulatorUnavailable as error:
             run.status, run.reason = "no-data-run", f"emulator unavailable: {error}"
             return run
@@ -225,6 +230,8 @@ def run_query(
         record["static_proof"] = static.verdict is Verdict.PROVEN
         if record["static_proof"] and label == "not_equivalent":
             record["oracle"] = "FALSE_PROOF"  # a proof of a pair the emulator refuted: a bug in a proof layer or in the emulator
+        if stat.get("rewritten"):
+            record["databases_differ_after_rewrite"] = stat["rewritten"]  # differences checked with IN/BETWEEN/IS TRUE written as plain operators
         if stat["untrusted"]:
             record["untrusted"] = stat["untrusted"]  # differences left unreported because the emulator is not trusted there
         if stat.get("error") and not stat["compared"]:

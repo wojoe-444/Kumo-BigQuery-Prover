@@ -35,7 +35,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from kumo_bq_prover import gsql_compliance as g  # noqa: E402
 from kumo_bq_prover.constructs import constructs  # noqa: E402
-from kumo_bq_prover.trust import value_hits  # noqa: E402
+from kumo_bq_prover.trust import value_hits, witness_facts  # noqa: E402
 
 OUT = ROOT / "src" / "kumo_bq_prover" / "untrusted_constructs.json"
 
@@ -54,7 +54,39 @@ CURATED = {
     "node:In": "IN and NOT IN with a NULL element return FALSE or TRUE where the reference returns NULL",
     "node:Between": "x BETWEEN NULL AND y returns NULL where BigQuery returns FALSE when the other bound already fails (found on the held-out files, so tuned on test)",
     "is:boolean": "NULL IS TRUE returns NULL where the reference returns FALSE",
+    # Found by probing the emulator against real BigQuery (inline constants, 2026-11-12); see docs/emulator-gaps.md.
+    "extract:WEEK": "EXTRACT(WEEK ...) numbers weeks differently (2016-01-21 is week 3 on BigQuery, 2 on the emulator)",
+    "date_diff:ISOWEEK": "DATE_DIFF(..., ISOWEEK) counts the wrong number of ISO weeks on the emulator",
+    "date_diff:WEEKDAY": "DATE_DIFF(..., WEEK(<weekday>)) was not checked on BigQuery",
+    "format:unverified": "FORMAT_DATE / FORMAT_TIMESTAMP with a directive not checked on BigQuery (%j and %e do not pad, %U %W %w %g %z %E*S differ) or a format that is not a literal",
+    "like:wild": "LIKE with `_`, an escape or a pattern that is not a literal: `'a' LIKE '_'` is FALSE on the emulator",
+    "fn:JUSTIFY_DAYS": "EXTRACT from the result of an interval function differs on the emulator",
+    "fn:JUSTIFY_HOURS": "EXTRACT from the result of an interval function differs on the emulator",
+    "fn:JUSTIFY_INTERVAL": "EXTRACT from the result of an interval function differs on the emulator",
+    "fn:MAKE_INTERVAL": "intervals differ on the emulator",
+    "fn:CURRENT_TIMESTAMP": "the two queries run at different moments, so they can differ without being inequivalent",
+    "fn:CURRENT_DATE": "the two queries run at different moments, so they can differ without being inequivalent",
+    "fn:CURRENT_DATETIME": "the two queries run at different moments, so they can differ without being inequivalent",
+    "fn:CURRENT_TIME": "the two queries run at different moments, so they can differ without being inequivalent",
+    "fn:UUID": "GENERATE_UUID differs on every call",
+    "node:AtTimeZone": "time zone conversions were not checked on BigQuery (the emulator cannot set a zone and rejects no invalid one)",
 }
+
+# Untrusted only when the witness holds this kind of value (``trust.witness_facts``): the emulator is exact otherwise.
+CONDITIONAL = {
+    "like:plain": ("newline", "a LIKE pattern with % does not match across a newline on the emulator, and `_` does not match one"),
+    "fn:SUBSTRING": ("non-ascii", "SUBSTR counts bytes, not characters, in non-ASCII text on the emulator"),
+    "fn:STR_POSITION": ("non-ascii", "STRPOS counts bytes, not characters, in non-ASCII text on the emulator"),
+    "fn:INSTR": ("non-ascii", "INSTR counts bytes, not characters, in non-ASCII text on the emulator"),
+}
+
+# Tags the compliance cases blame only because they sit in the same case as the real cause (EXTRACT of an interval, EXTRACT(WEEK ...),
+# a LIKE on a newline); each was checked on BigQuery with inline constants (docs/emulator-gaps.md) and is not blamed by co-occurrence.
+CHECKED_EXACT = {
+    f"extract:{part}": "checked on BigQuery 2026-11-12"
+    for part in ("YEAR", "QUARTER", "MONTH", "DAY", "DAYOFWEEK", "DAYOFYEAR", "ISOYEAR", "ISOWEEK", "HOUR", "MINUTE", "SECOND", "MILLISECOND", "DATE")
+}
+CHECKED_EXACT["format:verified"] = "checked on BigQuery 2026-11-12"
 
 MIN_SHARE = 1 / 3  # tags in more than this share of the measured cases are never untrusted
 RATE = 0.25  # a tag that fails in this share of its cases (and at least twice) is untrusted
@@ -101,7 +133,9 @@ def coverage(rows: list[dict], untrusted: dict) -> dict:
         if r["verdict"] not in ("pass", "wrong", "missing_error"):
             continue
         case = by_key[(r["file"], r["name"])]
-        flagged = bool(set(r["tags"]) & untrusted.keys()) or bool(value_hits(queries=case_texts(case)))
+        texts = case_texts(case)
+        facts = witness_facts(texts)
+        flagged = bool({t for t in set(r["tags"]) & untrusted.keys() if untrusted[t].get("when") in (None, *facts)}) or bool(value_hits(queries=texts))
         kind = "ok" if r["verdict"] == "pass" else "bad"
         out[kind][0] += flagged
         out[kind][1] += 1
@@ -121,7 +155,7 @@ def analyse(rows: list[dict]) -> tuple[dict, dict]:
     blamed: dict[str, list[str]] = {}
     for tag, c in stats.items():
         # A construct that disagrees with the reference in a quarter of its cases (and at least twice) is untrusted.
-        if tag not in ubiquitous and c["bad"] >= 2 and c["bad"] / (c["ok"] + c["bad"]) >= RATE:
+        if tag not in ubiquitous and tag not in CHECKED_EXACT and c["bad"] >= 2 and c["bad"] / (c["ok"] + c["bad"]) >= RATE:
             blamed[tag] = sorted(f"{r['file']}/{r['name']}" for r in measured if tag in r["tags"] and r["verdict"] in ("wrong", "missing_error"))
     return stats, blamed
 
@@ -148,6 +182,9 @@ def main() -> int:
         c = stats.get(tag, collections.Counter())
         untrusted.setdefault(tag, {"reason": reason, "ok": c["ok"], "bad": c["bad"], "errors": c["errors"], "examples": []})
         untrusted[tag]["reason"] = reason
+    for tag, (when, reason) in CONDITIONAL.items():
+        c = stats.get(tag, collections.Counter())
+        untrusted[tag] = {"reason": reason, "when": when, "ok": c["ok"], "bad": c["bad"], "errors": c["errors"], "examples": untrusted.get(tag, {}).get("examples", [])}
     counts = collections.Counter(r["verdict"] for r in rows)
     print(f"{len(rows)} cases: " + ", ".join(f"{k} {v}" for k, v in counts.most_common()))
     print(f"{len(untrusted)} untrusted constructs ({len(blamed)} from the compliance cases, {len(CURATED)} curated)\n")

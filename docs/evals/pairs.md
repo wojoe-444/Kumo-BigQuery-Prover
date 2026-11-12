@@ -8,12 +8,17 @@
 
 **Run:** `python tools/run_pairs_eval.py <corpus> --databases 8`. Each pair runs on 8 seeded random databases (and the pair's own witness rows when it has them). The emulator is restarted every 6 pairs because it slows down as tables accumulate.
 
-## Scores (2026-11-11, emulator v0.8.1, 8 databases)
+## Scores (emulator v0.8.1, 8 databases per pair)
 
-| Corpus | Equivalent: not refuted | Equivalent: refuted | Equivalent: emulator error | Different: refuted | Different: missed | Different: emulator error |
+The default run seeds the databases with the constants found in each pair's queries (see [Literal harvesting](#literal-harvesting)). `--no-harvest` gives the first baseline, `--specials` adds the edge values described below.
+
+| Corpus and run | Equivalent: not refuted | Equivalent: refuted | Equivalent: emulator error | Different: refuted | Different: missed | Different: emulator error |
 |---|---|---|---|---|---|---|
-| Documented rewrites (19 + 6) | 19 | 0 | 0 | 1 | 4 | 1 |
-| Numeric traps (65 + 26, 21 error-class unscored) | 61 | 1 | 3 | 11 | 14 | 1 |
+| Documented rewrites (19 + 6), baseline | 19 | 0 | 0 | 1 | 4 | 1 |
+| Documented rewrites, harvesting | 19 | 0 | 0 | 4 | 1 | 1 |
+| Numeric traps (65 + 26, 21 unscored), baseline | 61 | 1 | 3 | 11 | 14 | 1 |
+| Numeric traps, harvesting | 61 | 1 | 3 | 12 | 13 | 1 |
+| Numeric traps, harvesting and `--specials` (tuned on test) | 60 | 2 | 3 | 13 | 12 | 1 |
 
 Nothing is proved yet: the static layer only recognises identical queries. These are refutation scores, results files `benchmarks/results/pairs-*.json`.
 
@@ -22,8 +27,10 @@ Nothing is proved yet: the static layer only recognises identical queries. These
 Checked on real BigQuery (inline values, 0 bytes billed) unless noted.
 
 Emulator problems:
-- **Wrong result:** `CAST(2.5 AS INT64)` is 2 on the emulator, 3 on BigQuery. This is the dangerous kind: it would refute a true equivalence.
-- `1e309` as a literal makes the emulator fail while formatting the query; BigQuery accepts it.
+- **Wrong result:** `CAST(FLOAT64 AS INT64)` truncates toward zero on the emulator (2.5 gives 2, 2.7 gives 2, -2.7 gives -2), where BigQuery rounds half away from zero (2.5 gives 3, 2.7 gives 3). This is the dangerous kind: it refutes a true equivalence and hides a real difference.
+- **Wrong result:** NaN reads back as NULL, and -0.0 as 0.0.
+- `1e309` as a literal makes the emulator fail while formatting the query; BigQuery accepts it. `CAST('NaN' AS FLOAT64)` and `CAST('inf' AS FLOAT64)` in an INSERT fail the same way; `IEEE_DIVIDE(1, 0)` works for an infinity.
+- Integer literals past the INT64 range, like -9223372036854775809, are refused at analysis (as BigQuery does); a pool value must stay inside the range.
 - Unary minus (`-x`) is missing.
 - `LEFT JOIN UNNEST(arr)` without `ON` drops rows with an empty array (found in the first run, see [bq-shapes.md](bq-shapes.md)).
 
@@ -33,6 +40,14 @@ Corpus problems (the emulator agrees with BigQuery, the labels do not):
 
 Each of these cases carries a `bigquery_note` in its record.
 
-**Misses (headroom):** all 18 missed pairs need a specific value the random pools lack: a mid-year timestamp, two rows with one key, a code starting with `HN-`, a value on a boundary. The first lever is a generator that harvests the literals in the two queries and adds them, with neighbours, to the value pools.
+## Literal harvesting
+
+`src/kumo_bq_prover/harvest.py` reads the two queries (never the label), finds comparisons between one column and constants (`=`, `<>`, `<`, `BETWEEN`, `IN`, `LIKE`, also through `CAST` and `SUBSTR`), and offers the column the constant and its neighbours: integers plus and minus one, strings with and without a `%` and a trailing digit, dates plus and minus a day, timestamps at both ends of a date and one second either side. `datagen.random_database(extra=...)` draws from those values 60% of the time for the column. It only adds values, so it can find more counterexamples but cannot make two different queries look alike. NUMERIC constants with more than nine decimals are not offered (BigQuery rejects them).
+
+It moved documented rewrites from 1 to 4 refuted and numeric traps from 11 to 12. The three documented refutations were read by hand: an order at 23:59:58 on the last day of a year that only the BETWEEN version counts, a product added before the date that drops out of a join, and a code `hn-` in lower case that the `SUBSTR = 'HN-'` test does not match but a LIKE on the name does (a real difference, though not the one the case's note describes).
+
+`--specials` adds infinities, 1e16 and NUMERIC values at the scale limit to the base pools. That list was chosen after reading the misses, so its numbers are tuned on test. It gained one refutation (`numeric-double-round`, via 0.045) and one extra "wrong": `float-sum-union-branches-swapped`, labelled equivalent, differs because 2.5 + -1 + 1e16 and 1e16 + 2.5 + -1 round differently. BigQuery documents floating-point SUM as order-dependent, so the label needs a decision (a tolerance, or marking such pairs), not the prover.
+
+**Remaining misses (12 with specials):** five need NaN or -0.0 in the data, which the emulator cannot hold (NaN reads back as NULL, -0.0 as 0.0, and `CAST('NaN' AS FLOAT64)` in an INSERT fails to format). Two (`cast-versus-trunc`, `div-versus-cast`) hide behind the emulator's truncating CAST. Three need two NUMERIC columns at 0.000000001 in one row, which a random draw rarely gives. The last two need a float-sum regrouping or a NUMERIC beyond float range.
 
 **Limits:** results are compared as multisets, so a pair that differs only in row order counts as agreeing. Both queries raising an error on the same database counts as an error, not an agreement. A refutation is only as good as the emulator's answer on that construct, which is why every WRONG is looked at by hand before anything else.

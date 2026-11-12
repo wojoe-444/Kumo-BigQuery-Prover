@@ -38,7 +38,7 @@ See [evals/pairs.md](evals/pairs.md) for the scores, the emulator gaps found and
 
 ## Order of work
 
-1. Raise numeric traps and documented rewrites, starting with data generation that reuses the literals in the two queries (the misses so far need a specific date, string or duplicate key).
+1. Raise numeric traps and documented rewrites. Done first: data seeded with each pair's own constants ([evals/pairs.md](evals/pairs.md)). Next: decide how to label float SUM order, then the proof side (nothing is proved yet).
 2. Run the compliance fixture on the emulator and write the gap list.
 3. Pipeline equivalence and refutation on the emulator.
 4. Spider 2.0 pair generator.

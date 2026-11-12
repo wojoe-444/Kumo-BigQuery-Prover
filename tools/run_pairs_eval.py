@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from kumo_bq_prover.datagen import fixed_database, random_database  # noqa: E402
 from kumo_bq_prover.emulator import running_emulator  # noqa: E402
+from kumo_bq_prover.harvest import harvest  # noqa: E402
 from kumo_bq_prover.oracle import compare  # noqa: E402
 from kumo_bq_prover.static import prove_static  # noqa: E402
 from kumo_bq_prover.verdict import Verdict  # noqa: E402
@@ -50,13 +51,14 @@ def classify_error(reason: str) -> str:
     return (message.group(1) if message else text[:160]).replace("\\", "")
 
 
-def run_case(client, case: dict, databases: int) -> dict:
+def run_case(client, case: dict, databases: int, use_harvest: bool = True, specials: bool = False) -> dict:
     schema = schema_of(case)
     label = case["label"]
     if label not in ("equivalent", "not_equivalent"):
         return {"id": case["id"], "label": label, "outcome": "unscored"}
     static = prove_static(case["left"], case["right"]) is Verdict.PROVEN
-    setups = [random_database(schema, seed) for seed in range(databases)]
+    extra = harvest(case["left"], case["right"], schema) if use_harvest else None
+    setups = [random_database(schema, seed, extra=extra, specials=specials) for seed in range(databases)]
     witness = case.get("witness")
     if witness:
         setups.append(fixed_database(schema, witness["table"], witness["columns"], witness["rows"]))
@@ -87,6 +89,8 @@ def main() -> int:
     parser.add_argument("corpus", help="a name under benchmarks/pairs/, e.g. documented-rewrites")
     parser.add_argument("--databases", type=int, default=20, help="random databases per case")
     parser.add_argument("--json", help="write per-case outcomes to this file")
+    parser.add_argument("--no-harvest", action="store_true", help="seed data from the base pools only (the baseline)")
+    parser.add_argument("--specials", action="store_true", help="add NaN, infinities, -0.0 and scale-limit NUMERIC values to the pools")
     parser.add_argument("--only", help="run only case ids containing this text")
     args = parser.parse_args()
     cases = [json.loads(line) for line in (ROOT / "benchmarks/pairs" / f"{args.corpus}.jsonl").read_text().splitlines() if line]
@@ -98,7 +102,7 @@ def main() -> int:
     for start in range(0, len(cases), RECYCLE):
         with running_emulator() as client:
             for case in cases[start : start + RECYCLE]:
-                outcome = run_case(client, case, args.databases)
+                outcome = run_case(client, case, args.databases, use_harvest=not args.no_harvest, specials=args.specials)
                 outcomes.append(outcome)
                 note = next(iter(outcome.get("errors", {})), "")
                 print(f"{outcome['outcome']:15} {outcome['label']:15} {outcome['id']:32} {note[:70]}", flush=True)
@@ -111,7 +115,7 @@ def main() -> int:
     for message, n in gaps.most_common(15):
         print(f"  gap in {n:3} cases: {message}")
     if args.json:
-        pathlib.Path(args.json).write_text(json.dumps({"counts": {f"{a}/{b}": n for (a, b), n in counts.items()}, "gaps": dict(gaps), "cases": outcomes}, indent=1))
+        pathlib.Path(args.json).write_text(json.dumps({"counts": {f"{a}/{b}": n for (a, b), n in counts.items()}, "gaps": dict(gaps), "cases": outcomes}, indent=1, default=str))
     return 1 if any(o["outcome"] == "WRONG" for o in outcomes) else 0
 
 

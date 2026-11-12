@@ -32,6 +32,19 @@ _POOLS: dict[str, list] = {
 }
 
 
+#: Extra edge values, off by default: infinities, values past 2**53 in a sum, and NUMERIC
+#: values at the scale limit, the traps random data almost never reaches. GoogleSQL has no
+#: literal for an infinity, so FLOAT64 specials are strings rendered as IEEE_DIVIDE.
+#: Not offered, because the emulator cannot hold them: NaN reads back as NULL and -0.0 as
+#: 0.0, and CAST('NaN' AS FLOAT64) / CAST('inf' AS FLOAT64) in an INSERT fail to format.
+SPECIAL_POOLS: dict[str, list] = {
+    "FLOAT64": ["inf", "-inf", 1e16, 0.045],
+    "NUMERIC": ["0.000000001", "0.045", "-0.5"],
+    "BIGNUMERIC": ["0.000000001", "0.045"],
+}
+_FLOAT_SPECIALS = {"inf": "IEEE_DIVIDE(1, 0)", "-inf": "IEEE_DIVIDE(0 - 1, 0)"}
+
+
 def normalize_type(name: str) -> str:
     key = name.upper().split("(")[0].strip()
     if key not in _ALIASES:
@@ -45,6 +58,8 @@ def literal(kind: str, value) -> str:
     if kind == "INT64":
         return str(value)
     if kind == "FLOAT64":
+        if isinstance(value, str) and value in _FLOAT_SPECIALS:
+            return _FLOAT_SPECIALS[value]
         return repr(float(value))
     if kind in ("NUMERIC", "BIGNUMERIC"):
         return f"{kind} '{value}'"
@@ -68,13 +83,35 @@ def insert_statement(table: str, columns: dict[str, str], rows: list[list]) -> s
     return f"INSERT INTO {table} ({', '.join(columns)}) VALUES {body}"
 
 
-def random_database(schema: dict[str, dict[str, str]], seed: int, max_rows: int = 4) -> list[str]:
-    """Setup statements for one random database (tables, then their rows)."""
+#: Chance that a cell with harvested values takes one of them instead of the base pool.
+HARVESTED_SHARE = 0.6
+
+
+def random_database(
+    schema: dict[str, dict[str, str]],
+    seed: int,
+    max_rows: int = 4,
+    extra: dict[str, list] | None = None,
+    specials: bool = False,
+) -> list[str]:
+    """Setup statements for one random database (tables, then their rows).
+
+    ``extra`` maps a column name to values worth trying (see ``harvest.harvest``);
+    those cells draw from them with probability ``HARVESTED_SHARE``. ``specials``
+    adds ``SPECIAL_POOLS`` to the base pools.
+    """
     rng = random.Random(seed)
+    extra = extra or {}
     statements = create_statements(schema)
+
+    def cell(column: str, kind: str):
+        if extra.get(column) and rng.random() < HARVESTED_SHARE:
+            return rng.choice(extra[column])
+        return rng.choice(_POOLS[kind] + (SPECIAL_POOLS.get(kind, []) if specials else []))
+
     for table, cols in schema.items():
         kinds = [normalize_type(t) for t in cols.values()]
-        rows = [[rng.choice(_POOLS[k]) for k in kinds] for _ in range(rng.randint(0, max_rows))]
+        rows = [[cell(c, k) for c, k in zip(cols, kinds)] for _ in range(rng.randint(0, max_rows))]
         if rows:
             statements.append(insert_statement(table, cols, rows))
     return statements

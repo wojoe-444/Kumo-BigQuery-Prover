@@ -35,3 +35,22 @@ def test_literals_are_typed_and_escaped():
 def test_fixed_database_holds_exactly_the_rows_given():
     statements = fixed_database(SCHEMA, "t", ["x", "s"], [[9007199254740993, "a"]])
     assert statements[-1] == "INSERT INTO t (x, s) VALUES (9007199254740993, 'a')"
+
+
+def test_extra_values_are_used_and_keep_the_database_deterministic():
+    schema = {"t": {"x": "INT64"}}
+    extra = {"x": [424242]}
+    statements = [s for seed in range(20) for s in random_database(schema, seed, extra=extra)]
+    assert any("424242" in s for s in statements)
+    assert random_database(schema, 5, extra=extra) == random_database(schema, 5, extra=extra)
+    assert all("424242" not in s for seed in range(20) for s in random_database(schema, seed))
+
+
+def test_specials_are_off_by_default_and_infinities_render_as_ieee_divide():
+    schema = {"t": {"f": "FLOAT64", "n": "NUMERIC"}}
+    plain = [s for seed in range(60) for s in random_database(schema, seed)]
+    assert not any("IEEE_DIVIDE" in s or "NUMERIC '0.000000001'" in s for s in plain)
+    special = [s for seed in range(60) for s in random_database(schema, seed, specials=True)]
+    assert any("IEEE_DIVIDE(1, 0)" in s for s in special) and any("NUMERIC '0.000000001'" in s for s in special)
+    for statement in special:
+        sqlglot.parse_one(statement, read="bigquery")

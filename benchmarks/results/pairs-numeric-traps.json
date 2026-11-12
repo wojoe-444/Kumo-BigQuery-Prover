@@ -2,14 +2,21 @@
   "eval": "pairs-numeric-traps",
   "status": "measured",
   "size": 112,
-  "score": "equivalent: 62 of 65 not refuted (one refutation the guard demotes), 3 emulator errors; not equivalent: 11 of 26 refuted, 1 demoted by the guard, 13 missed, 1 emulator error; 21 error-class cases unscored",
-  "proved": 0,
-  "wrong": 0,
+  "score": "equivalent: 51 of 65 proved clean, 8 proved under a disclosed assumption, 5 unproved, 1 refuted (emulator bug); not equivalent: 12 of 26 refuted, 10 missed, 3 proved only under the disclosed no-NaN assumption, 1 emulator error; 21 error-class cases unscored",
+  "proved": 51,
+  "wrong": 1,
   "date": "2026-11-12",
   "emulator": "goccy/bigquery-emulator v0.8.1",
   "command": "python tools/run_pairs_eval.py numeric-traps --databases 8",
-  "baseline": "without literal harvesting (--no-harvest): 11 of 26 refuted, 14 missed, 1 wrong (2026-11-11)",
+  "baseline": "before the proof layers (refutation only, with literal harvesting): 0 proved, 12 of 26 refuted, 13 missed, 1 wrong (2026-11-12 morning)",
   "with_specials": "with --specials (tuned on test): 13 of 26 refuted, 12 missed, 2 wrong. The extra wrong is a label question: SUM over FLOAT64 depends on addition order, and the pair float-sum-union-branches-swapped is labelled equivalent",
-  "caveats": "Before the guard the 1 wrong was the emulator, not the prover: CAST(FLOAT64 AS INT64) truncates where real BigQuery rounds half away from zero (2.5 gives 2, BigQuery 3). Refutation only; 8 seeded random databases plus the case's witness rows when it has one. Two label problems found against real BigQuery: ten-decimal NUMERIC literals are rejected (numeric-literal-rounding, numeric-literal-below-half). Development set, no held-out split.",
-  "guard": "With the trust guard: cast-versus-round (CAST(FLOAT64 AS INT64) truncates on the emulator) is demoted instead of refuted, so wrong is 0; safe-divide-versus-filter is demoted. Before the guard: 12 of 26 refuted, 1 wrong. The base FLOAT64 pool no longer holds 1e308 (odd-seeded databases add it)."
+  "caveats": "The 1 wrong is the emulator, not the prover: CAST(FLOAT64 AS INT64) truncates where real BigQuery rounds half away from zero (2.5 gives 2, BigQuery 3). Proofs come from the layers ported from Kumo_SQL_Prover (docs/ported-layers.md); proved means no layer's assumption list names an assumption the case violates. 11 pairs are proved only under a disclosed assumption and count as unknown: 3 NaN pairs (the prover assumes FLOAT64 is never NaN, and the emulator cannot hold NaN so it cannot check) and 8 float-sum pairs (the prover treats SUM as independent of row order, which BigQuery does not promise: the open FLOAT64 SUM labelling question for Walter). The first run of the ported layers proved float-sum-pre-aggregated, a false proof (the algebraic layer regroups FLOAT64 partial sums as if addition were associative); the emulator did not catch it on random data, only the label did. The layer is now skipped for any pair that may sum a FLOAT64. 2 proofs are withheld because the algebraic layer cannot compare runtime errors (int-sum-pre-aggregated, float-avg-versus-sum-over-count). Refutation: 8 seeded random databases plus the case's witness rows. Two label problems found against real BigQuery: ten-decimal NUMERIC literals are rejected (numeric-literal-rounding, numeric-literal-below-half). Development set, no held-out split; the earlier prover's rules were tuned on these cases (tuned on test).",
+  "false_proofs": 0,
+  "assumed": 11,
+  "proof_layers": {
+    "identical": 3,
+    "structural": 2,
+    "algebraic": 44,
+    "smt": 2
+  }
 }

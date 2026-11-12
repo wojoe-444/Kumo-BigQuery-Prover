@@ -60,6 +60,10 @@ The others are disclosures: result column types are not compared (confirm schema
 - **False-proof detector:** `tools/run_pairs_eval.py` runs every pair the layers prove on the seeded databases of the emulator. A proved pair the emulator refutes is `PROOF_REFUTED`, a proved pair labelled different is `FALSE_PROOF`, and the script exits 1 on either. See [evals/pairs.md](evals/pairs.md) for the scores.
 - **What the detector cannot see:** a pair whose difference needs data the generator rarely draws. The FLOAT64 regrouping false proof was not found by 8 random databases; the label found it.
 
+## Known: run the suite in parallel
+
+`pytest` is configured with `-n auto` (pytest-xdist, in the `dev` extra). Run serially (`-p no:xdist`), the last nonlinear NUMERIC refutation in `tests/ported/test_smt_numeric.py` (`..._reference_arithmetic_agrees_with[3]`) can hit its 8 second solver limit and fail: it finishes within a second of the limit, and in one long process the shared Z3 context has grown with every earlier test. Under xdist it passes (checked on three runs). Resetting the Z3 context between tests breaks the module-level terms the tests share, so it is not done. The cause is a solver time limit near its edge, not a wrong answer; if it fails on your machine, raise `timeout_ms` for that test or run it alone.
+
 ## Limits
 
 - The ported layers were tuned on corpora that this repository uses as development sets, so scores on them say little about new pairs ("tuned on test").

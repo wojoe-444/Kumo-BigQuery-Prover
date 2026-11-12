@@ -4,9 +4,10 @@
 For every case the two queries run on N seeded random databases (plus the
 case's own witness rows when it has them). Outcomes:
 
-  equivalent label      proved | ok | WRONG (refuted: an emulator bug or a bad label) | emulator_error
+  equivalent label      proved | ok | WRONG (refuted: an emulator bug or a bad label; a refutation the guard demotes is ok) | emulator_error
                         PROOF_REFUTED (proved by a static layer and refuted: a false proof until shown otherwise)
-  not_equivalent label  caught (refuted) | missed | emulator_error | FALSE_PROOF (a static layer proved it)
+  not_equivalent label  caught (refuted) | demoted (refuted on the emulator, but on a construct or value it is not
+                        trusted on, see trust.py: reported UNKNOWN) | missed | emulator_error | FALSE_PROOF (a static layer proved it)
   either label          assumed (proved, but the proof lists an assumption the case names in violates/discharged: counted as unknown)
   any other label       unscored
 
@@ -61,16 +62,21 @@ def run_case(client, case: dict, databases: int, use_harvest: bool = True, speci
         return {"id": case["id"], "label": label, "outcome": "unscored"}
     static = prove_static_detailed(case["left"], case["right"], schema_of(case), layers=layers)
     extra = harvest(case["left"], case["right"], schema) if use_harvest else None
-    setups = [random_database(schema, seed, extra=extra, specials=specials) for seed in range(databases)]
+    setups = [random_database(schema, seed, extra=extra, specials=specials, extremes=seed % 2 == 1) for seed in range(databases)]
     witness = case.get("witness")
     if witness:
         setups.append(fixed_database(schema, witness["table"], witness["columns"], witness["rows"]))
-    refuted_on, errors, agreed = None, collections.Counter(), 0
+    refuted_on, errors, agreed, demoted = None, collections.Counter(), 0, None
+    # A proved pair runs without the trust guard: any difference the emulator finds on it must surface (false-proof detector).
+    guarded = static.verdict is not Verdict.PROVEN
     for setup in setups:
-        result = compare(client, case["left"], case["right"], setup=setup)
+        result = compare(client, case["left"], case["right"], setup=setup, trust=guarded)
         if result.verdict is Verdict.REFUTED:
             refuted_on = {"setup": setup, "left": result.left_rows[:5], "right": result.right_rows[:5]}
             break
+        if result.untrusted:  # different rows, but on a construct or value the emulator is not trusted on (see trust.py)
+            demoted = demoted or {"setup": setup, "left": result.left_rows[:5], "right": result.right_rows[:5], "untrusted": result.untrusted}
+            continue
         if "emulator" in result.reason:
             errors[classify_error(result.reason)] += 1
         else:
@@ -86,17 +92,17 @@ def run_case(client, case: dict, databases: int, use_harvest: bool = True, speci
         elif proved:
             outcome = "PROOF_REFUTED" if refuted_on else "proved"
         else:
-            outcome = "WRONG" if refuted_on else ("emulator_error" if not agreed else "ok")
+            outcome = "WRONG" if refuted_on else ("ok" if (agreed or demoted) else "emulator_error")
     else:
         if assumed:
             outcome = "assumed"
         elif proved:
             outcome = "FALSE_PROOF"
         else:
-            outcome = "caught" if refuted_on else ("emulator_error" if not agreed else "missed")
+            outcome = "caught" if refuted_on else ("demoted" if demoted else ("emulator_error" if not agreed else "missed"))
     return {
         "id": case["id"], "label": label, "outcome": outcome, "proof_layer": static.layer if proved else None, "assumptions": list(static.assumptions), "error_report": static.errors, "withheld": static.withheld or None,
-        "databases_agreed": agreed, "errors": dict(errors), "counterexample": refuted_on,
+        "databases_agreed": agreed, "errors": dict(errors), "counterexample": refuted_on, "demoted": demoted,
     }
 
 

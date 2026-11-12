@@ -54,3 +54,13 @@ def test_specials_are_off_by_default_and_infinities_render_as_ieee_divide():
     assert any("IEEE_DIVIDE(1, 0)" in s for s in special) and any("NUMERIC '0.000000001'" in s for s in special)
     for statement in special:
         sqlglot.parse_one(statement, read="bigquery")
+
+
+def test_default_databases_hold_no_extreme_floats_but_extreme_ones_can():
+    from kumo_bq_prover.datagen import random_database
+
+    schema = {"t": {"f": "FLOAT64"}}
+    plain = " ".join(" ".join(random_database(schema, seed, max_rows=20)) for seed in range(30))
+    assert "e+308" not in plain and "1e308" not in plain
+    extreme = " ".join(" ".join(random_database(schema, seed, max_rows=20, extremes=True)) for seed in range(30))
+    assert "1e+308" in extreme

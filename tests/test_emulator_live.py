@@ -34,3 +34,11 @@ def test_oracle_refutes_a_real_difference(client):
         "SELECT x FROM UNNEST([1, 2]) AS x",
     )
     assert result.verdict is Verdict.REFUTED
+
+
+def test_refutation_on_a_known_emulator_divergence_is_unknown(client):
+    # On real BigQuery `3 IN (1, 2, NULL)` is NULL; the emulator says FALSE, so the two queries differ here.
+    left, right = "SELECT 3 IN (1, 2, NULL) AS x", "SELECT CAST(NULL AS BOOL) AS x"
+    guarded = compare(client, left, right)
+    assert guarded.verdict is Verdict.UNKNOWN and "node:In" in guarded.untrusted
+    assert compare(client, left, right, trust=False).verdict is Verdict.REFUTED

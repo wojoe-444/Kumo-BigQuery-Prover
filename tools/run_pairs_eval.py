@@ -5,8 +5,14 @@ For every case the two queries run on N seeded random databases (plus the
 case's own witness rows when it has them). Outcomes:
 
   equivalent label      ok | WRONG (refuted: an emulator bug or a bad label) | emulator_error
-  not_equivalent label  caught (refuted) | missed | emulator_error
+  not_equivalent label  caught (refuted) | missed | incomplete (not refuted, but the emulator failed
+                        on some databases) | emulator_error
+  unresolved label      refuted | not_refuted | emulator_error (the label is decided by this run)
   any other label       unscored
+
+A case with a "database" field (the sample-database corpus) runs on databases generated under
+the declared keys of benchmarks/pairs/schemas/<database>.sql, minus the case's "drop" list, plus
+its own witness rows completed with legal values (see constrained.py).
 
 The script exits 1 when any case is WRONG. Emulator rejections are grouped by
 message at the end: that list is the emulator's gap list.
@@ -24,6 +30,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
+from kumo_bq_prover import constrained  # noqa: E402
 from kumo_bq_prover.datagen import fixed_database, random_database  # noqa: E402
 from kumo_bq_prover.emulator import running_emulator  # noqa: E402
 from kumo_bq_prover.harvest import harvest  # noqa: E402
@@ -51,17 +58,50 @@ def classify_error(reason: str) -> str:
     return (message.group(1) if message else text[:160]).replace("\\", "")
 
 
+UNSAFE_SCHEMA = {"t": {c: "INT64" for c in "abc"}, "u": {c: "INT64" for c in "abc"}}
+_DDL: dict[str, dict] = {}
+
+
+def tables_of(database: str) -> dict:
+    if database not in _DDL:
+        _DDL[database] = constrained.parse_ddl((ROOT / "benchmarks/pairs/schemas" / f"{database}.sql").read_text())
+    return _DDL[database]
+
+
+def constrained_setups(case: dict, databases: int, use_harvest: bool = True) -> list[list[str]]:
+    tables = tables_of(case["database"])
+    names = constrained.referenced_tables(tables, case["left"], case["right"])
+    drops = constrained.Drops.parse(case.get("drop"))
+    extra = harvest(case["left"], case["right"], {n: tables[n].columns for n in names}) if use_harvest else None
+    setups = [constrained.database(tables, names, seed, drops, extra=extra) for seed in range(databases)]
+    witness = case.get("witness")
+    if isinstance(witness, dict):
+        setups.append(constrained.witness_database(tables, names, witness, drops))
+    return setups
+
+
 def run_case(client, case: dict, databases: int, use_harvest: bool = True, specials: bool = False) -> dict:
-    schema = schema_of(case)
     label = case["label"]
-    if label not in ("equivalent", "not_equivalent"):
+    if label not in ("equivalent", "not_equivalent", "unresolved"):
         return {"id": case["id"], "label": label, "outcome": "unscored"}
     static = prove_static(case["left"], case["right"]) is Verdict.PROVEN
-    extra = harvest(case["left"], case["right"], schema) if use_harvest else None
-    setups = [random_database(schema, seed, extra=extra, specials=specials) for seed in range(databases)]
-    witness = case.get("witness")
-    if witness:
-        setups.append(fixed_database(schema, witness["table"], witness["columns"], witness["rows"]))
+    if "database" in case:
+        setups = constrained_setups(case, databases, use_harvest)
+    elif case.get("family"):
+        # Unsafe-rewrite pairs: two INT64 tables over the small domain 0..3 with duplicates, up to 6 rows
+        # each. Even seeds add NULL to the domain (about one cell in five, which INTERSECT and NOT IN
+        # need), odd seeds do not (a NULL key never joins, which hides duplicate-producing joins).
+        setups = []
+        for seed in range(databases):
+            domain = {c: [0, 1, 2, 3, None] if seed % 2 == 0 else [0, 1, 2, 3] for c in "abc"}
+            setups.append(random_database(UNSAFE_SCHEMA, seed, max_rows=6, extra=domain))
+    else:
+        schema = schema_of(case)
+        extra = harvest(case["left"], case["right"], schema) if use_harvest else None
+        setups = [random_database(schema, seed, extra=extra, specials=specials) for seed in range(databases)]
+        witness = case.get("witness")
+        if witness:
+            setups.append(fixed_database(schema, witness["table"], witness["columns"], witness["rows"]))
     refuted_on, errors, agreed = None, collections.Counter(), 0
     for setup in setups:
         result = compare(client, case["left"], case["right"], setup=setup)
@@ -74,8 +114,11 @@ def run_case(client, case: dict, databases: int, use_harvest: bool = True, speci
             agreed += 1
     if label == "equivalent":
         outcome = "WRONG" if refuted_on else ("emulator_error" if not agreed else "ok")
+    elif label == "unresolved":
+        outcome = "refuted" if refuted_on else ("emulator_error" if not agreed else "not_refuted")
     else:
-        outcome = "caught" if refuted_on else ("emulator_error" if not agreed else "missed")
+        # "incomplete": some database failed on the emulator, so the miss is not clean
+        outcome = "caught" if refuted_on else ("emulator_error" if not agreed else ("incomplete" if errors else "missed"))
     if static and label == "equivalent" and not refuted_on:
         outcome = "ok"
     return {
@@ -92,10 +135,14 @@ def main() -> int:
     parser.add_argument("--no-harvest", action="store_true", help="seed data from the base pools only (the baseline)")
     parser.add_argument("--specials", action="store_true", help="add NaN, infinities, -0.0 and scale-limit NUMERIC values to the pools")
     parser.add_argument("--only", help="run only case ids containing this text")
+    parser.add_argument("--shard", help="i/n: run every n-th case starting at i, so n runs can share one corpus")
     args = parser.parse_args()
     cases = [json.loads(line) for line in (ROOT / "benchmarks/pairs" / f"{args.corpus}.jsonl").read_text().splitlines() if line]
     if args.only:
         cases = [c for c in cases if args.only in c["id"]]
+    if args.shard:
+        index, count = (int(part) for part in args.shard.split("/"))
+        cases = cases[index::count]
     outcomes = []
     # The emulator slows down as datasets accumulate (every query sees every table),
     # so it is restarted every RECYCLE cases.

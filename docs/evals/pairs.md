@@ -20,7 +20,25 @@ The default run seeds the databases with the constants found in each pair's quer
 | Numeric traps, harvesting | 61 | 1 | 3 | 12 | 13 | 1 |
 | Numeric traps, harvesting and `--specials` (tuned on test) | 60 | 2 | 3 | 13 | 12 | 1 |
 
-Nothing is proved yet: the static layer only recognises identical queries. These are refutation scores, results files `benchmarks/results/pairs-*.json`.
+These are refutation scores (before the proof layers were added), results files `benchmarks/results/pairs-*.json`. Proofs are in the next section.
+
+## Proofs (2026-11-12)
+
+With the layers from [ported-layers.md](../ported-layers.md), `tools/run_pairs_eval.py` proves what it can before running anything, then runs every pair on the 8 databases anyway, so the emulator checks the proofs. Same emulator, same data.
+
+| Corpus | Equivalent: proved | Proved under a disclosed assumption (counted unknown) | Equivalent: not proved | False proofs |
+|---|---|---|---|---|
+| Documented rewrites (19 equivalent) | 18 (3 identical, 1 structural, 14 algebraic) | 0 | 1 | 0 |
+| Numeric traps (65 equivalent) | 51 (3 identical, 2 structural, 44 algebraic, 2 SMT) | 8 float-sum pairs | 5, and 1 refuted by the emulator's CAST bug | 0 |
+
+The 26 different-labelled numeric pairs: 12 refuted, 10 missed, and 3 NaN pairs that the prover proves only under its no-NaN assumption (disclosed, counted unknown, not wrong). 21 error-class pairs stay unscored. Refutation counts did not change.
+
+What the proof run found, which is the reason to keep the detector:
+- **A false proof inherited from Kumo_SQL_Prover** (window pruning, a global aggregate inside a window), found by a ported test, not by the corpora. Fixed in the port.
+- **A second one the corpora found:** `float-sum-pre-aggregated` was proved by the algebraic layer, which regroups FLOAT64 partial sums as if addition were associative. The emulator did not refute it on random data (it needs 1e16 beside small values); the label did. The algebraic layer is now skipped for any pair that may sum a FLOAT64, which costs the proofs of the float-sum pairs (the SMT layer proves some of them under the disclosed order assumption).
+- **Two proofs withheld on purpose:** `int-sum-pre-aggregated` and `float-avg-versus-sum-over-count`, because the layer proved the rows equal but could not compare runtime errors.
+
+**Limits:** the layers' rules were tuned on these corpora in the earlier prover (tuned on test), so these counts measure recall on development data, not generalisation. The emulator can only refute on data it can build, and it cannot hold NaN or -0.0.
 
 ## What the runs found
 

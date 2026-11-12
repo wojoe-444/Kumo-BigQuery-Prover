@@ -22,6 +22,8 @@ class OracleResult:
     setup: list[str] = field(default_factory=list)
     left_rows: list[tuple] = field(default_factory=list)
     right_rows: list[tuple] = field(default_factory=list)
+    #: What a static proof assumes (empty for a refutation or an unknown). See ``static.StaticResult``.
+    assumptions: tuple[str, ...] = ()
 
 
 def compare(

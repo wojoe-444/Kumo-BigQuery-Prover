@@ -2,7 +2,7 @@
   "eval": "pairs-documented-rewrites",
   "status": "measured",
   "size": 25,
-  "score": "equivalent: 18 of 19 proved, 0 refuted; not equivalent: 4 of 6 refuted, 1 missed, 1 invalid in BigQuery",
+  "score": "equivalent: 18 of 19 proved, 0 refuted; not equivalent: 2 of 6 refuted, 2 demoted by the guard (refuted on the emulator, UNKNOWN reported), 1 missed, 1 invalid in BigQuery",
   "proved": 18,
   "wrong": 0,
   "date": "2026-11-12",
@@ -15,5 +15,6 @@
     "structural": 1,
     "algebraic": 14
   },
-  "false_proofs": 0
+  "false_proofs": 0,
+  "guard": "With the trust guard (docs/emulator-gaps.md): R012-037 (BETWEEN) and R012-042 (SUBSTRING, LIKE) are demoted. Before the guard: 4 of 6 refuted. Proofs are unchanged (18 proved, 0 false proofs): a proved pair still runs on the databases without the guard."
 }

@@ -17,7 +17,9 @@ with running_emulator() as client:
 print(result.verdict)  # Verdict.REFUTED, with both row sets in result
 ```
 
-Verdicts: `PROVEN` (sound), `REFUTED` (a concrete input with different rows), `UNKNOWN` (everything else, including "agreed on the data it saw").
+Verdicts: `PROVEN` (sound), `REFUTED` (a concrete input with different rows), `UNKNOWN` (everything else, including "agreed on the data it saw" and "different on the emulator, on a construct or value it gets wrong").
+
+The emulator is not BigQuery. Google's GoogleSQL compliance cases measured where it disagrees with the reference ([docs/emulator-gaps.md](docs/emulator-gaps.md)); a difference that involves such a construct or an extreme value is reported UNKNOWN with the reasons in `result.untrusted`, never REFUTED.
 
 ## Setup
 
@@ -30,6 +32,6 @@ python -m pytest -m emulator                    # live tests, need the binary
 python tools/run_oracle_eval.py                 # score the synthetic corpus
 ```
 
-Which evals to improve this against, in order: [docs/hillclimb-evals.md](docs/hillclimb-evals.md). Pair corpora: `python tools/run_pairs_eval.py documented-rewrites` or `numeric-traps`.
+Which evals to improve this against, in order: [docs/hillclimb-evals.md](docs/hillclimb-evals.md). Pair corpora: `python tools/run_pairs_eval.py documented-rewrites` or `numeric-traps`. Compliance cases on the emulator: `python tools/run_compliance.py --split all --json RESULTS.json`, then `python tools/compliance_gaps.py RESULTS.json`.
 
 Docs: [docs/README.md](docs/README.md).

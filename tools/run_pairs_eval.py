@@ -4,8 +4,9 @@
 For every case the two queries run on N seeded random databases (plus the
 case's own witness rows when it has them). Outcomes:
 
-  equivalent label      ok | WRONG (refuted: an emulator bug or a bad label) | emulator_error
-  not_equivalent label  caught (refuted) | missed | emulator_error
+  equivalent label      ok | WRONG (refuted: an emulator bug or a bad label; a refutation the guard demotes is ok) | emulator_error
+  not_equivalent label  caught (refuted) | demoted (refuted on the emulator, but on a construct or value it is
+                        not trusted on, see trust.py: reported UNKNOWN) | missed | emulator_error
   any other label       unscored
 
 The script exits 1 when any case is WRONG. Emulator rejections are grouped by
@@ -58,29 +59,32 @@ def run_case(client, case: dict, databases: int, use_harvest: bool = True, speci
         return {"id": case["id"], "label": label, "outcome": "unscored"}
     static = prove_static(case["left"], case["right"]) is Verdict.PROVEN
     extra = harvest(case["left"], case["right"], schema) if use_harvest else None
-    setups = [random_database(schema, seed, extra=extra, specials=specials) for seed in range(databases)]
+    setups = [random_database(schema, seed, extra=extra, specials=specials, extremes=seed % 2 == 1) for seed in range(databases)]
     witness = case.get("witness")
     if witness:
         setups.append(fixed_database(schema, witness["table"], witness["columns"], witness["rows"]))
-    refuted_on, errors, agreed = None, collections.Counter(), 0
+    refuted_on, errors, agreed, demoted = None, collections.Counter(), 0, None
     for setup in setups:
         result = compare(client, case["left"], case["right"], setup=setup)
         if result.verdict is Verdict.REFUTED:
             refuted_on = {"setup": setup, "left": result.left_rows[:5], "right": result.right_rows[:5]}
             break
+        if result.untrusted:  # the emulator returned different rows, but not on ground it is trusted on
+            demoted = demoted or {"setup": setup, "left": result.left_rows[:5], "right": result.right_rows[:5], "untrusted": result.untrusted}
+            continue
         if "emulator" in result.reason:
             errors[classify_error(result.reason)] += 1
         else:
             agreed += 1
     if label == "equivalent":
-        outcome = "WRONG" if refuted_on else ("emulator_error" if not agreed else "ok")
+        outcome = "WRONG" if refuted_on else ("ok" if (agreed or demoted) else "emulator_error")
     else:
-        outcome = "caught" if refuted_on else ("emulator_error" if not agreed else "missed")
+        outcome = "caught" if refuted_on else ("demoted" if demoted else ("emulator_error" if not agreed else "missed"))
     if static and label == "equivalent" and not refuted_on:
         outcome = "ok"
     return {
         "id": case["id"], "label": label, "outcome": outcome, "static_proof": static,
-        "databases_agreed": agreed, "errors": dict(errors), "counterexample": refuted_on,
+        "databases_agreed": agreed, "errors": dict(errors), "counterexample": refuted_on, "demoted": demoted,
     }
 
 

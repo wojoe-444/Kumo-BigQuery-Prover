@@ -21,7 +21,7 @@ _ALIASES = {
 
 _POOLS: dict[str, list] = {
     "INT64": [0, 1, 2, 3, -1, 10, 100, 9007199254740993, None, None],
-    "FLOAT64": [0.0, 0.5, 1.5, -1.0, 2.5, 0.1, 1e308, None, None],
+    "FLOAT64": [0.0, 0.5, 1.5, -1.0, 2.5, 0.1, None, None],
     "NUMERIC": ["0", "0.5", "1.25", "-1", "10.000000001", "0.1", None, None],
     "BIGNUMERIC": ["0", "0.5", "1.25", "-1", "0.1", None, None],
     "STRING": ["", "a", "A", "b", "ab", " a", "Ab", None, None],
@@ -31,6 +31,11 @@ _POOLS: dict[str, list] = {
     "TIMESTAMP": ["2024-01-01 00:00:00+00", "2024-02-29 12:30:45+00", None],
 }
 
+
+#: Values near the float limit. They are only drawn by databases made with ``extremes=True``: the emulator
+#: disagrees with the GoogleSQL reference on such magnitudes (see ``trust.py``), so a refutation built on
+#: them is reported UNKNOWN, and a database without them can still give a trusted counterexample.
+EXTREME_POOLS: dict[str, list] = {"FLOAT64": [1e308]}
 
 #: Extra edge values, off by default: infinities, values past 2**53 in a sum, and NUMERIC
 #: values at the scale limit, the traps random data almost never reaches. GoogleSQL has no
@@ -93,12 +98,13 @@ def random_database(
     max_rows: int = 4,
     extra: dict[str, list] | None = None,
     specials: bool = False,
+    extremes: bool = False,
 ) -> list[str]:
     """Setup statements for one random database (tables, then their rows).
 
     ``extra`` maps a column name to values worth trying (see ``harvest.harvest``);
     those cells draw from them with probability ``HARVESTED_SHARE``. ``specials``
-    adds ``SPECIAL_POOLS`` to the base pools.
+    adds ``SPECIAL_POOLS`` to the base pools and ``extremes`` adds ``EXTREME_POOLS``.
     """
     rng = random.Random(seed)
     extra = extra or {}
@@ -107,7 +113,8 @@ def random_database(
     def cell(column: str, kind: str):
         if extra.get(column) and rng.random() < HARVESTED_SHARE:
             return rng.choice(extra[column])
-        return rng.choice(_POOLS[kind] + (SPECIAL_POOLS.get(kind, []) if specials else []))
+        pool = _POOLS[kind] + (SPECIAL_POOLS.get(kind, []) if specials else []) + (EXTREME_POOLS.get(kind, []) if extremes else [])
+        return rng.choice(pool)
 
     for table, cols in schema.items():
         kinds = [normalize_type(t) for t in cols.values()]

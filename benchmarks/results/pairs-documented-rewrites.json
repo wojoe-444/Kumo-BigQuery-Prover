@@ -2,12 +2,13 @@
   "eval": "pairs-documented-rewrites",
   "status": "measured",
   "size": 25,
-  "score": "equivalent: 19 of 19 not refuted; not equivalent: 4 of 6 refuted, 1 missed, 1 invalid in BigQuery",
+  "score": "equivalent: 19 of 19 not refuted; not equivalent: 2 of 6 refuted, 2 demoted by the guard (refuted on the emulator, UNKNOWN reported), 1 missed, 1 invalid in BigQuery",
   "proved": 0,
   "wrong": 0,
   "date": "2026-11-12",
   "emulator": "goccy/bigquery-emulator v0.8.1",
   "command": "python tools/run_pairs_eval.py documented-rewrites --databases 8",
   "baseline": "without literal harvesting (--no-harvest): 1 of 6 refuted, 4 missed (2026-11-11)",
-  "caveats": "Refutation only: nothing is proved yet. 8 seeded random databases per case, data seeded with the constants in each pair's queries (never its label). The 3 new refutations were checked by hand against each case's note. One case (R012b-09, `= NULL`) is rejected by real BigQuery. Development set, no held-out split."
+  "caveats": "Refutation only: nothing is proved yet. 8 seeded random databases per case, data seeded with the constants in each pair's queries (never its label). The 3 new refutations were checked by hand against each case's note. One case (R012b-09, `= NULL`) is rejected by real BigQuery. Development set, no held-out split.",
+  "guard": "With the trust guard (docs/emulator-gaps.md): R012-037 (BETWEEN) and R012-042 (SUBSTRING, LIKE) are demoted. Before the guard: 4 of 6 refuted (2026-11-12 harvesting run)."
 }

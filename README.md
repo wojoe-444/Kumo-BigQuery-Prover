@@ -2,7 +2,7 @@
 
 An equivalence prover that assumes BigQuery exclusively. Query pairs are parsed as BigQuery SQL and, when they must be run, executed on the BigQuery emulator. There is no dialect translation and no DuckDB.
 
-Status: proofs and refutations both work. Four static layers (identical, structural, algebraic, SMT) are ported from Kumo_SQL_Prover with every other-engine path removed ([docs/ported-layers.md](docs/ported-layers.md)); the emulator refutes a pair with a counterexample and checks every proof on built databases. Documented rewrites: 18 of 19 equivalent pairs proved; numeric traps: 51 of 65 proved, 0 false proofs ([docs/evals/pairs.md](docs/evals/pairs.md)). See [docs/roadmap.md](docs/roadmap.md).
+Status: proofs and refutations both work. Four static layers (identical, structural, algebraic, SMT) are ported from Kumo_SQL_Prover with every other-engine path removed ([docs/ported-layers.md](docs/ported-layers.md)); the emulator refutes a pair with a counterexample and checks every proof on built databases. Documented rewrites: 18 of 19 equivalent pairs proved; numeric traps: 51 of 65 proved; a held-out set frozen before the layers ran on it: 28 of 39 proved, 23 of 24 different pairs refuted; a proof audit over 1,186 pairs from the upstream tests: 411 proved, 0 unexplained refutations. 0 false proofs in all ([docs/evals/pairs.md](docs/evals/pairs.md), [docs/evals/heldout.md](docs/evals/heldout.md), [docs/evals/proof-audit.md](docs/evals/proof-audit.md)). See [docs/roadmap.md](docs/roadmap.md).
 
 ```python
 from kumo_bq_prover.emulator import running_emulator
@@ -32,6 +32,6 @@ python -m pytest -m emulator                    # live tests, need the binary
 python tools/run_oracle_eval.py                 # score the synthetic corpus
 ```
 
-Which evals to improve this against, in order: [docs/hillclimb-evals.md](docs/hillclimb-evals.md). Pair corpora: `python tools/run_pairs_eval.py documented-rewrites` or `numeric-traps`.
+Which evals to improve this against, in order: [docs/hillclimb-evals.md](docs/hillclimb-evals.md). Pair corpora: `python tools/run_pairs_eval.py documented-rewrites`, `numeric-traps` or `heldout-2026-11-12` (never tune on the last). Proof audit: `python tools/audit_proofs.py benchmarks/audit/upstream-test-pairs.jsonl`.
 
 Docs: [docs/README.md](docs/README.md).

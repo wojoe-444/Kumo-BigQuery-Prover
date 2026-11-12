@@ -123,3 +123,11 @@ def test_public_entry_point_returns_the_layer_and_assumptions_without_an_emulato
     assert isinstance(result.assumptions, tuple)
     unknown = prove_equivalent("SELECT x FROM t", "SELECT y FROM t", schema=SCHEMA)
     assert unknown.verdict is Verdict.UNKNOWN
+
+
+def test_identical_text_is_not_proved_when_the_query_can_answer_differently_on_two_runs():
+    """Found by the proof audit: two runs of an approximate aggregate with tied counts return different values."""
+
+    approximate = "SELECT APPROX_TOP_COUNT(id, 2) AS x FROM t"
+    assert detail(approximate, approximate).verdict is Verdict.UNKNOWN
+    assert detail("SELECT x FROM t", "SELECT x FROM t").verdict is Verdict.PROVEN

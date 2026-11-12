@@ -1,0 +1,4 @@
+{
+  "up-1057": "Real BigQuery returns the same five rows for both queries (checked 2026-11-12, inline values, 0 bytes billed). The emulator gives a UNION ALL branch the columns of an earlier branch that repeated an expression: `SELECT a, a AS b FROM u UNION ALL SELECT a, b FROM u` returns (1, 1) twice where BigQuery returns (1, 1) and (1, 2).",
+  "up-0333": "Real BigQuery returns the same four rows for both queries (checked 2026-11-12, inline values, 0 bytes billed). The emulator returns NULL for `(b > 0) IS NOT TRUE` when b is NULL, so the row is dropped; BigQuery returns TRUE."
+}

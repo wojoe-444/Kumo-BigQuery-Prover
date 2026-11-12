@@ -1,0 +1,19 @@
+{
+  "eval": "pairs-heldout-2026-11-12",
+  "status": "measured",
+  "size": 63,
+  "score": "equivalent: 28 of 39 proved, 11 not proved, 0 refuted; not equivalent: 23 of 24 refuted, 1 missed",
+  "proved": 28,
+  "wrong": 0,
+  "false_proofs": 0,
+  "proof_layers": {
+    "identical": 1,
+    "structural": 3,
+    "algebraic": 24
+  },
+  "date": "2026-11-12",
+  "emulator": "goccy/bigquery-emulator v0.8.1",
+  "command": "python tools/run_pairs_eval.py heldout-2026-11-12 --databases 8",
+  "freeze": "pairs and labels committed in 286c528 before the proof layers ran on them; labels were checked on the emulator only (all 39 equivalent pairs agree on 12 seeded databases, all 24 different pairs refuted, 3 of them on a witness row)",
+  "caveats": "A held-out set for the ported layers: 63 pairs written 2026-11-12 by the same agent that ported them, who knew the layers' rules, so it is held out from tuning, not independent. Never tune on it: a rule change that is motivated by one of its pairs must say so and the set must be replaced. 5 of the 11 unproved equivalent pairs are withheld because the algebraic layer cannot compare runtime errors (ho-countif, ho-where-to-having-key, ho-struct-field, ho-window-sum-frame, ho-scalar-subquery-constant). The one missed different pair (ho-in-vs-join-duplicates) is data the 8 random databases did not draw; it was refuted in the label check on 12. Labels follow GoogleSQL semantics as the author knows them; none was checked on real BigQuery."
+}

@@ -40,6 +40,16 @@ What the proof run found, which is the reason to keep the detector:
 
 **Limits:** the layers' rules were tuned on these corpora in the earlier prover (tuned on test), so these counts measure recall on development data, not generalisation. The emulator can only refute on data it can build, and it cannot hold NaN or -0.0.
 
+## Label checks on real BigQuery (2026-11-12)
+
+Thirty-six numeric-trap cases carried an `unverified` premise from the earlier prover. Each premise that is not about FLOAT64 SUM order was run on real BigQuery with inline values (0 bytes billed). The result is in the case's record: `bigquery_checked` (premise confirmed, with what was observed), or `bigquery_note` (premise contradicted or plan-dependent).
+
+- **Confirmed (7 cases):** `float-literal-underflow` (BigQuery accepts 1e-324; it equals 0), and the NUMERIC rounding premises of `numeric-product-casts-wider`, `numeric-round-nine-noop`, `numeric-division-roundtrip`, `numeric-division-nine-digits`, `numeric-add-product-twice` and `numeric-mul-distributes` (a NUMERIC product or quotient is rounded to nine decimals, half away from zero: `NUMERIC '0.000000001' * NUMERIC '0.5'` is 0.000000001, and `NUMERIC '1' / NUMERIC '3' * 3` is 0.999999999).
+- **One label was wrong, now fixed (the corpus is 66 equivalent and 25 different pairs from here on, not 65 and 26):** `numeric-versus-float-literal` (`n = 1e20` against `n = NUMERIC '100000000000000000000'`) was labelled different on the premise that the NUMERIC side is converted to FLOAT64. BigQuery converts the FLOAT64 *literal* to NUMERIC when it meets a NUMERIC column, so both predicates agree on every row (checked on `100000000000000000000` and `100000000000000000001`); only `n = CAST(1e20 AS FLOAT64)` converts `n`. The label is now equivalent, with a note, and the emulator leaves the pair alone.
+- **INT64 SUM is order-dependent too (4 cases noted, labels unchanged):** BigQuery raises `integer overflow` for `SUM` over `[9223372036854775807, 1, -1]` and returns 9223372036854775807 for `[-1, 1, 9223372036854775807]`. A partial sum can overflow, so a rewrite that changes the order rows are added (`int-sum-union-branches-swapped`, `int-sum-pre-aggregated`, `int-sum-split`, `int-sum-with-float-filter-elsewhere`) is not equivalent in the strict sense the labels assume. This is the same question as FLOAT64 SUM order, so it waits for Walter's decision with it.
+- **Plan-dependent (2 cases noted):** in `GROUP BY y HAVING y > 1` over a group whose `SUM` overflows INT64, BigQuery did not raise; the filter was applied before adding. The `refines` and `introduces_error` labels describe semantics, not a plan.
+- **Not checked:** the FLOAT64 SUM and AVG premises (the open question), and the premises of the other HAVING and window cases.
+
 ## What the runs found
 
 Checked on real BigQuery (inline values, 0 bytes billed) unless noted.

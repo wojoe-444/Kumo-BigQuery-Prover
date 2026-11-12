@@ -2,7 +2,7 @@
   "eval": "pairs-numeric-traps",
   "status": "measured",
   "size": 112,
-  "score": "equivalent: 51 of 65 proved clean, 8 proved under a disclosed assumption, 5 unproved (one the emulator refutes through its CAST bug, which the guard demotes), 0 refuted; not equivalent: 11 of 26 refuted, 1 demoted by the guard, 10 missed, 3 proved only under the disclosed no-NaN assumption, 1 emulator error; 21 error-class cases unscored",
+  "score": "equivalent: 51 of 65 proved clean, 8 proved under a disclosed assumption, 6 unproved and left alone by the emulator (one of them, numeric-versus-float-literal, was relabelled equivalent on 2026-11-12; another is the emulator's CAST bug, which the guard demotes), 0 refuted; not equivalent (25 after the relabel): 11 refuted, 1 demoted by the guard, 9 missed, 3 proved only under the disclosed no-NaN assumption, 1 emulator error; 21 error-class cases unscored",
   "proved": 51,
   "wrong": 0,
   "date": "2026-11-12",
@@ -19,5 +19,6 @@
     "algebraic": 44,
     "smt": 2
   },
-  "guard": "With the trust guard: cast-versus-round (CAST(FLOAT64 AS INT64) truncates on the emulator) is demoted instead of refuted, so wrong is 0; safe-divide-versus-filter is demoted. Before the guard: 12 of 26 refuted, 1 wrong. Proofs are unchanged (51 proved, 0 false proofs). The base FLOAT64 pool no longer holds 1e308 (odd-seeded databases add it)."
+  "guard": "With the trust guard: cast-versus-round (CAST(FLOAT64 AS INT64) truncates on the emulator) is demoted instead of refuted, so wrong is 0; safe-divide-versus-filter is demoted. Before the guard: 12 of 26 refuted, 1 wrong. Proofs are unchanged (51 proved, 0 false proofs). The base FLOAT64 pool no longer holds 1e308 (odd-seeded databases add it).",
+  "label_checks": "2026-11-12: 7 premises confirmed on real BigQuery (bigquery_checked in each case), numeric-versus-float-literal relabelled equivalent (BigQuery converts a FLOAT64 literal to NUMERIC), 4 INT64 SUM cases noted as order-dependent (labels unchanged), 2 HAVING/window cases noted as plan-dependent. See docs/evals/pairs.md#label-checks-on-real-bigquery-2026-11-12. Rerun 2026-11-12 after the relabel: 51 proved, 7 equivalent unproved and left alone, 8 assumed, 9 different missed; 0 wrong, 0 false proofs."
 }

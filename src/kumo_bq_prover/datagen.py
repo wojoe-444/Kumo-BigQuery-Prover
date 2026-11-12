@@ -16,7 +16,7 @@ _ALIASES = {
     "NUMERIC": "NUMERIC", "DECIMAL": "NUMERIC", "BIGNUMERIC": "BIGNUMERIC",
     "VARCHAR": "STRING", "STRING": "STRING", "TEXT": "STRING",
     "BOOLEAN": "BOOL", "BOOL": "BOOL",
-    "DATE": "DATE", "DATETIME": "DATETIME", "TIMESTAMP": "TIMESTAMP",
+    "BYTES": "BYTES", "DATE": "DATE", "DATETIME": "DATETIME", "TIMESTAMP": "TIMESTAMP",
 }
 
 _POOLS: dict[str, list] = {
@@ -26,6 +26,7 @@ _POOLS: dict[str, list] = {
     "BIGNUMERIC": ["0", "0.5", "1.25", "-1", "0.1", None, None],
     "STRING": ["", "a", "A", "b", "ab", " a", "Ab", None, None],
     "BOOL": [True, False, None],
+    "BYTES": ["a", "b", None],
     "DATE": ["2024-01-01", "2024-02-29", "2023-12-31", None],
     "DATETIME": ["2024-01-01 00:00:00", "2024-02-29 12:30:45", None],
     "TIMESTAMP": ["2024-01-01 00:00:00+00", "2024-02-29 12:30:45+00", None],
@@ -72,6 +73,8 @@ def literal(kind: str, value) -> str:
         return "'" + str(value).replace("\\", "\\\\").replace("'", "\\'") + "'"
     if kind == "BOOL":
         return "TRUE" if value else "FALSE"
+    if kind == "BYTES":
+        return "b'" + str(value).replace("\\", "\\\\").replace("'", "\\'") + "'"
     return f"{kind} '{value}'"
 
 

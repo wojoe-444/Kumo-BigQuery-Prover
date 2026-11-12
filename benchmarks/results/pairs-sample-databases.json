@@ -1,0 +1,13 @@
+{
+  "eval": "pairs-sample-databases",
+  "status": "measured",
+  "size": 286,
+  "score": "equivalent: 118 of 121 left alone, 0 refuted, 3 emulator errors; not equivalent: 132 refuted, 24 refuted but demoted by the trust guard, 3 missed, 2 incomplete, 4 emulator errors",
+  "proved": 0,
+  "wrong": 0,
+  "date": "2026-11-12",
+  "emulator": "goccy/bigquery-emulator v0.8.1",
+  "command": "python tools/run_pairs_eval.py sample-databases --databases 16 --layers none",
+  "baseline": "first run (8 databases, no literal harvesting, before the trust guard): 141 of 160 different pairs refuted, 19 missed; 1 wrong, a label that is invalid in BigQuery (fixed)",
+  "caveats": "Six public sample databases (Chinook, Northwind, Sakila, Pagila, Oracle HR, Oracle Customer Orders) in BigQuery dialect, authored in KumoSQL, labels from the earlier DuckDB-based prover. Refutation only: nothing is proved (--layers none; the ported layers do not read declared keys). Data is generated under the declared primary keys, NOT NULL and foreign keys, minus each pair's drop list. 1 label was wrong in BigQuery and is fixed (sk-fk-chain-join-elimination: a bare table name equal to a column name returns the whole row as a STRUCT; an aliased twin carries the equivalence). 24 refutations are demoted because the emulator is not trusted on IN (node:In). 3 missed pairs have witnesses on the upstream data, which this repository does not load. 9 Oracle HR pairs hit an emulator gap: a table named jobs cannot be read or written. Development set, no held-out split; data-generator settings were adjusted after reading the misses (tuned on test)."
+}

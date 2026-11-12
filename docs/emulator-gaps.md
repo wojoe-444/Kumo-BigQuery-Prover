@@ -30,6 +30,8 @@ Inline constants, 0 bytes billed, 2026-11-12. In each row the emulator and BigQu
 
 Found in earlier runs of the pair corpora and the [proof audit](evals/proof-audit.md), listed in [evals/pairs.md](evals/pairs.md) (`x IS NOT TRUE` returns NULL for NULL, and a `UNION ALL` branch picks up the columns of an earlier branch that repeated an expression, also checked on real BigQuery): `CAST(FLOAT64 AS INT64)` truncates where BigQuery rounds half away from zero, NaN reads back as NULL, -0.0 as 0.0, `LEFT JOIN UNNEST` drops the row of an empty array, unary minus is missing, `1e309` and `CAST('NaN' AS FLOAT64)` fail to format. `SELECT SAFE_DIVIDE(1, 0)` agrees (NULL on both); only the overflow case `SAFE_DIVIDE(1e300, 1e-300)` differs.
 
+A table named `jobs` can be created on the emulator but cannot be read or written afterwards (`Column job_id is not present in table jobs`, found 2026-11-12 on the Oracle HR sample pairs). The oracle answers UNKNOWN through the emulator error; nine pairs of [evals/sample-databases.md](evals/sample-databases.md) are affected. Real BigQuery has no such restriction. Not found by the compliance cases, which never name a table `jobs`.
+
 ## Gaps by class
 
 Counts are over the 4,748 claimed cases (3,149 development, 1,599 held-out); see the eval page for every figure.

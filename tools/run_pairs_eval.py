@@ -171,6 +171,7 @@ def main() -> int:
     parser.add_argument("--no-harvest", action="store_true", help="seed data from the base pools only (the baseline)")
     parser.add_argument("--specials", action="store_true", help="add NaN, infinities, -0.0 and scale-limit NUMERIC values to the pools")
     parser.add_argument("--only", help="run only case ids containing this text")
+    parser.add_argument("--ids", help="a file with one case id per line: run only those cases")
     parser.add_argument("--shard", help="i/n: run every n-th case starting at i, so n runs can share one corpus")
     parser.add_argument("--layers", default=",".join(LAYERS), help="comma-separated static layers to use (identical,structural,algebraic,smt); 'none' for the oracle alone")
     args = parser.parse_args()
@@ -178,6 +179,9 @@ def main() -> int:
     cases = [json.loads(line) for line in (ROOT / "benchmarks/pairs" / f"{args.corpus}.jsonl").read_text().splitlines() if line]
     if args.only:
         cases = [c for c in cases if args.only in c["id"]]
+    if args.ids:
+        wanted = set(pathlib.Path(args.ids).read_text().split())
+        cases = [c for c in cases if c["id"] in wanted]
     if args.shard:
         index, count = (int(part) for part in args.shard.split("/"))
         cases = cases[index::count]

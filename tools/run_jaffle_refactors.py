@@ -2,7 +2,7 @@
 """Score the emulator oracle on the Jaffle Shop refactors (benchmarks/pairs/jaffle-shop-refactors.jsonl).
 
 Each case is a refactor of a five-model dbt project: the models before and after, rendered
-to BigQuery SQL in dependency order. For every database (the upstream seeds, an authored
+to BigQuery SQL in dependency order (``ref('x')`` is kept as ``@@x@@`` and becomes a dataset-qualified name when built). For every database (the upstream seeds, an authored
 edge database and N seeded random databases over the seed tables) both pipelines are built
 on the emulator as ``CREATE TABLE name AS <model>``, and every model that exists in both
 is compared as a multiset (FLOAT64 columns rounded to 6 digits, because a FLOAT64 sum has no
@@ -21,6 +21,7 @@ import collections
 import json
 import pathlib
 import random
+import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -74,7 +75,9 @@ def build(client, dataset: str, schema: dict, rows: dict, models: list[list[str]
             client.query(insert_statement(table, columns, rows[table]), dataset)
     out = {}
     for name, sql in models:
-        client.query(f"CREATE TABLE {name} AS {sql}", dataset)
+        # dbt's ref() is a qualified name, so a CTE called like a model does not shadow it
+        qualified = re.sub(r"@@(\w+)@@", lambda m: f"`{dataset}.{m.group(1)}`", sql)
+        client.query(f"CREATE TABLE {name} AS {qualified}", dataset)
     for name, _ in models:
         result = client.query(f"SELECT * FROM {name}", dataset)
         out[name] = multiset([tuple(round(c, FLOAT_DIGITS) if isinstance(c, float) else c for c in row) for row in result.rows])

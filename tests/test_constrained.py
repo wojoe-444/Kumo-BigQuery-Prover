@@ -92,7 +92,7 @@ def test_witness_database_completes_columns_and_parents():
 def test_corpus_labels_and_sizes():
     unsafe = [json.loads(line) for line in (PAIRS / "unsafe-rewrites.jsonl").read_text().splitlines()]
     assert len(unsafe) == 560
-    assert {r["label"] for r in unsafe} == {"equivalent", "unresolved"}
+    assert {r["label"] for r in unsafe} == {"equivalent", "not_equivalent"}
     sample = [json.loads(line) for line in (PAIRS / "sample-databases.jsonl").read_text().splitlines()]
     assert len(sample) == 286
     assert len({r["id"] for r in sample}) == len(sample)

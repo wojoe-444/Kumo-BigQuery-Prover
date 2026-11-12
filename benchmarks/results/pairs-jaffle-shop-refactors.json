@@ -1,0 +1,13 @@
+{
+  "eval": "pairs-jaffle-shop-refactors",
+  "status": "measured",
+  "size": 15,
+  "score": "equivalent: 8 of 8 left alone, 0 refuted; not equivalent: 7 of 7 refuted",
+  "proved": 0,
+  "wrong": 0,
+  "date": "2026-11-12",
+  "emulator": "goccy/bigquery-emulator v0.8.1",
+  "command": "python tools/run_jaffle_refactors.py --databases 8",
+  "baseline": "first run: 7 of 8 equivalent left alone, 1 emulator error caused by rendering ref() as a bare name that a CTE shadowed; fixed by qualifying refs as dbt does",
+  "caveats": "Authored refactors of the dbt jaffle_shop_duckdb project (Apache-2.0, pinned commit), five models built as CREATE TABLE AS in dependency order on the emulator; every model present in both pipelines is compared as a multiset with FLOAT64 rounded to 6 digits. 10 databases: the upstream seeds, an authored edge database and 8 seeded random databases. 3 of the 7 different refactors already differ on the upstream seeds, the other 4 only on the authored edge database (which runs before the random ones). Refutation only: nothing is proved. 15 cases, no held-out split (KumoSQL held out 1 by SHA-1 of the case id; not used here)."
+}

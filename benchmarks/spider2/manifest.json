@@ -1,0 +1,860 @@
+{
+ "source": "https://github.com/xlang-ai/Spider2 (MIT, Copyright (c) 2024 bird_sql), spider2-lite/evaluation_suite/gold/sql",
+ "licence": "LICENSE-Spider2",
+ "fetched": "2026-10-02 (copied from the KumoSQL fixture tests/fixtures/spider2/gold, unmodified)",
+ "note": "205 BigQuery and GA4 tasks exist; upstream publishes gold SQL for 142. The split is every fifth task by SHA-1 of its id (the same split as KumoSQL's spider2 eval).",
+ "cases": [
+  {
+   "id": "bq011",
+   "db": "ga4",
+   "sha256": "a9e7e5d3d5c1c8061ff999257ce25fb1e551470822e75758108884052ef361f3",
+   "split": "dev"
+  },
+  {
+   "id": "bq010",
+   "db": "ga360",
+   "sha256": "8ebd2628f485712750d625defca0b7e37d1bba5f941ebb6c485dabc765e60b86",
+   "split": "held-out"
+  },
+  {
+   "id": "bq009",
+   "db": "ga360",
+   "sha256": "c5abfa92e9cfb485894fab069f712a9b979aa755f8236bff181b5230437accd6",
+   "split": "dev"
+  },
+  {
+   "id": "bq001",
+   "db": "ga360",
+   "sha256": "042b6d32c5ad5cbfb39f7f365d9865e57bf20adbc2cab283a5ba2548d6135d7b",
+   "split": "held-out"
+  },
+  {
+   "id": "bq002",
+   "db": "ga360",
+   "sha256": "58357497e8a81e6e63b593f6feba69335cb279759f562ca0432ceeeb60dd8616",
+   "split": "dev"
+  },
+  {
+   "id": "bq003",
+   "db": "ga360",
+   "sha256": "d65832dbd98b23f057c5254ae0a269fe767c2ee0b31c355935301179d675bae4",
+   "split": "dev"
+  },
+  {
+   "id": "bq004",
+   "db": "ga360",
+   "sha256": "8fe892022cc615aaed4d0881ce559428ad8f217113e607630b6a78a22139e7ca",
+   "split": "held-out"
+  },
+  {
+   "id": "bq008",
+   "db": "ga360",
+   "sha256": "fface953d6f5edf3186de100953e7355e5cad1a06a0bcfac61e8099808d11337",
+   "split": "dev"
+  },
+  {
+   "id": "bq269",
+   "db": "ga360",
+   "sha256": "756ad11628e1c6d6049d31086f3be64ac2b5cf7fde7a593daeece1bae4647437",
+   "split": "dev"
+  },
+  {
+   "id": "bq268",
+   "db": "ga360",
+   "sha256": "fc28c2d7377cc9ca8f331a7aad86f523bc8b95d7e151b1360aa29956950a987b",
+   "split": "dev"
+  },
+  {
+   "id": "bq270",
+   "db": "ga360",
+   "sha256": "c7d772374beea9b6892bbc388bcc73c85a4308bad52cdc8db0b52a8b10f13f84",
+   "split": "dev"
+  },
+  {
+   "id": "bq275",
+   "db": "ga360",
+   "sha256": "be72bedc70e8ee0f16ca82254ba08bef4a75406d864f7932ab1fd6a68df23c32",
+   "split": "dev"
+  },
+  {
+   "id": "bq374",
+   "db": "ga360",
+   "sha256": "8b4614e0a7a0dfb2cdc4d0de0fd1ed48e9f8ac5db1febe1ca78641985631543d",
+   "split": "dev"
+  },
+  {
+   "id": "bq234",
+   "db": "cms_data",
+   "sha256": "d126a443b99e863441f92f9b1208e43579c1da32995e61d4de5fdbd801e7db30",
+   "split": "dev"
+  },
+  {
+   "id": "bq235",
+   "db": "cms_data",
+   "sha256": "f6d270186fea74e5f3f97adaeeb84745e3d3dbe31ea6d7df82e02deed481fd67",
+   "split": "dev"
+  },
+  {
+   "id": "bq172",
+   "db": "cms_data",
+   "sha256": "ae97e03b2b37a4215cd507c3ccc4b42c196a88df86bc5f8d5c18fc674329bd92",
+   "split": "dev"
+  },
+  {
+   "id": "bq354",
+   "db": "cms_data",
+   "sha256": "1c3b6e1cfc67eb40094542c2bff1801d86e74f615c256c507d146948586df733",
+   "split": "dev"
+  },
+  {
+   "id": "bq355",
+   "db": "cms_data",
+   "sha256": "d1e908ac0145c57b18047d28262bd967c7e357c1080160d4fc02d6f214a1b378",
+   "split": "held-out"
+  },
+  {
+   "id": "bq032",
+   "db": "noaa_data",
+   "sha256": "6ccfe4e756433498707945cf53b63c905ae95e84f66120a856cf25cdd3d6f33b",
+   "split": "dev"
+  },
+  {
+   "id": "bq119",
+   "db": "noaa_data",
+   "sha256": "703f6f97d61dc1f11755bb5656afc4c51a82f07c1851137296bebf0e99ea9fe1",
+   "split": "dev"
+  },
+  {
+   "id": "bq419",
+   "db": "noaa_data",
+   "sha256": "8b72fdc88a63d7e8a03c0d0d07210c152c3b8a2622cb226f242cff3034fcc15a",
+   "split": "dev"
+  },
+  {
+   "id": "bq042",
+   "db": "noaa_data",
+   "sha256": "57245644a15ddf1486e90fb1ed5f9f97dcc886e6f82574f072dafdf50d24a871",
+   "split": "dev"
+  },
+  {
+   "id": "bq394",
+   "db": "noaa_data",
+   "sha256": "e045eac6639b33d34888fe0ac89d07b8de13abd25ec4cc28dc4da8262dcb6b88",
+   "split": "held-out"
+  },
+  {
+   "id": "bq357",
+   "db": "noaa_data",
+   "sha256": "f7cf0d0f4ebafb3d862a00485e9173877d8296a99ffeed4ef0143d52434a8165",
+   "split": "dev"
+  },
+  {
+   "id": "bq045",
+   "db": "noaa_data",
+   "sha256": "d6ef5b74886fa08728325338df99853d85cc2d01c0c561ee5a4732f20382133f",
+   "split": "dev"
+  },
+  {
+   "id": "bq290",
+   "db": "noaa_data",
+   "sha256": "7ab6c6d647afd9924940d03e89aaa001bd8f1a0271fc8dabb1d94e11149b36cc",
+   "split": "dev"
+  },
+  {
+   "id": "bq031",
+   "db": "noaa_data",
+   "sha256": "bc91761e692662de05396ac01b2e3b9c0cff7b8799c82d59b8bec1dd93408a4c",
+   "split": "dev"
+  },
+  {
+   "id": "bq392",
+   "db": "noaa_gsod",
+   "sha256": "29cda3a84926b01403def241de101ccd00cae56d466f53c09d56280c03cd1a11",
+   "split": "dev"
+  },
+  {
+   "id": "bq034",
+   "db": "ghcn_d",
+   "sha256": "00a154dcd41f272548e7fc4b5ce4012da8312689df5ec5a16ee4f35cc9984ee2",
+   "split": "dev"
+  },
+  {
+   "id": "bq383",
+   "db": "ghcn_d",
+   "sha256": "277dfb398b838ed1f2fecf78922d535129b734177a03c1218e2ea7e2eb69fe74",
+   "split": "dev"
+  },
+  {
+   "id": "bq053",
+   "db": "new_york",
+   "sha256": "c6d05a7e3ee4b3b5c7d3d75d9d78a9c9867ad359efb2ea8100425490990687e7",
+   "split": "dev"
+  },
+  {
+   "id": "bq021",
+   "db": "new_york",
+   "sha256": "ad107c3c8c691b1f353a134847abe1b11b9a4aaa549199e20a203102ed3174f1",
+   "split": "held-out"
+  },
+  {
+   "id": "bq185",
+   "db": "new_york_plus",
+   "sha256": "f1c796775f916a7fd0b46e9fe6e5edb1e81de97e4e1d3a94cea1c0fbd062ed08",
+   "split": "dev"
+  },
+  {
+   "id": "bq098",
+   "db": "new_york_plus",
+   "sha256": "53e1becade270cb049a576597a5dc64f986d5e5fbee56dec5aad4637436e2bd9",
+   "split": "held-out"
+  },
+  {
+   "id": "bq039",
+   "db": "new_york_plus",
+   "sha256": "03df5a5fbf2da5ec21147d42c61cb97d459d364dad7eb1407d2ed47ed79b824b",
+   "split": "held-out"
+  },
+  {
+   "id": "bq203",
+   "db": "new_york_plus",
+   "sha256": "67d1d68ac7021e153015f41e09e74e869a3bfcd141f8406f4f9d5739db9e4d72",
+   "split": "dev"
+  },
+  {
+   "id": "bq035",
+   "db": "san_francisco",
+   "sha256": "8c570f149452006d28bac87c15f1e831517ab991bb73899963df275df13f68a2",
+   "split": "dev"
+  },
+  {
+   "id": "bq081",
+   "db": "san_francisco_plus",
+   "sha256": "93d0c4291933df2be96239d881d343062e16f3ad4456aa2689e277b32bf7a81d",
+   "split": "held-out"
+  },
+  {
+   "id": "bq339",
+   "db": "san_francisco_plus",
+   "sha256": "11c12120f0ea66ff6f7b72b1198b4ba127aa4855eb80e3446ad68142453c9d69",
+   "split": "dev"
+  },
+  {
+   "id": "bq400",
+   "db": "san_francisco_plus",
+   "sha256": "9959a38739298be2657e13c805ee1d04b7901705101c8983162cf8c030ff443b",
+   "split": "dev"
+  },
+  {
+   "id": "bq059",
+   "db": "san_francisco_plus",
+   "sha256": "8a1f7a8008b646cd8a24bbf3e71e0d2d8fc83ff3cc1350a2433a77e9bc7a1c00",
+   "split": "dev"
+  },
+  {
+   "id": "bq376",
+   "db": "san_francisco_plus",
+   "sha256": "bf3a4511afff70a634fc52f824a2040a42abcf8d9a0d1c64b45c9712da3cb758",
+   "split": "dev"
+  },
+  {
+   "id": "bq025",
+   "db": "census_bureau_international",
+   "sha256": "d605566ca40be73c8f8432bb19649c0bb72d1558bfc6cc77d77df7f83d468e39",
+   "split": "dev"
+  },
+  {
+   "id": "bq115",
+   "db": "census_bureau_international",
+   "sha256": "1ba86fd3640c28f64b15725ead9791b02b0960fce7ef304c3140be5c57fb6258",
+   "split": "dev"
+  },
+  {
+   "id": "bq018",
+   "db": "covid19_open_data",
+   "sha256": "fa7a400d424a30e3f2bce78016a36b2544a2193aaaecf54d12cfb8e5b928e880",
+   "split": "dev"
+  },
+  {
+   "id": "bq086",
+   "db": "covid19_open_world_bank",
+   "sha256": "bd86d5e6a1735d823f6a192458dbf72959ff50215dc69eb3002970a663e59b6a",
+   "split": "dev"
+  },
+  {
+   "id": "bq085",
+   "db": "covid19_jhu_world_bank",
+   "sha256": "3c236394b8cfa2407f9ba502009a104037b4c4681c783756ac43aff07b70a59f",
+   "split": "dev"
+  },
+  {
+   "id": "bq130",
+   "db": "covid19_nyt",
+   "sha256": "e02b7b700e7fd45763047cd96958060eb02b237ce08dcf7695c2599b41a50e86",
+   "split": "dev"
+  },
+  {
+   "id": "bq087",
+   "db": "covid19_symptom_search",
+   "sha256": "2cef2f2e52a588511be58fb53cf5e1bed8d662b120edd52e3ab5beea80b8e8cf",
+   "split": "dev"
+  },
+  {
+   "id": "bq088",
+   "db": "covid19_symptom_search",
+   "sha256": "722914eb5bed303e704ddb003fc55adc7de843847751efd866385c7b6f8d6abf",
+   "split": "dev"
+  },
+  {
+   "id": "bq089",
+   "db": "covid19_usa",
+   "sha256": "aa389b30652f97ddf64e4d0f8636bd2a1d4411225998beae96d3024eb62d062a",
+   "split": "dev"
+  },
+  {
+   "id": "bq407",
+   "db": "covid19_usa",
+   "sha256": "da6baeb65d82c44e731e98831c397f3471a996c3cb9d7eef2e5028c1e911bd13",
+   "split": "dev"
+  },
+  {
+   "id": "bq060",
+   "db": "census_bureau_international",
+   "sha256": "45571cc3ba933ee8abc6d9ae14e96c2da5fc7eba662faae12510b606b3241484",
+   "split": "dev"
+  },
+  {
+   "id": "bq338",
+   "db": "census_bureau_acs_1",
+   "sha256": "9d9382502350beb35bb4d6ba3e65de1816d4347443a4092cf1a41f7e7fdf2184",
+   "split": "held-out"
+  },
+  {
+   "id": "bq061",
+   "db": "census_bureau_acs_1",
+   "sha256": "3cf5591293bd749a56925598e6cf576de9bb0adcbeb6ddf72f1a08f7cbf22053",
+   "split": "dev"
+  },
+  {
+   "id": "bq064",
+   "db": "census_bureau_acs_1",
+   "sha256": "163938039c596d4c83776078b4dc03ccbe8ecc22de0771a420a21ae0e8bd8067",
+   "split": "dev"
+  },
+  {
+   "id": "bq198",
+   "db": "ncaa_basketball",
+   "sha256": "72bc1180814eb9106f420e050f29cd389127a3e4c5e04280f18ca05438ce0691",
+   "split": "dev"
+  },
+  {
+   "id": "bq428",
+   "db": "ncaa_basketball",
+   "sha256": "37075f2fe597196c2ac2df9322296b22fb01593791c96d9250cef529fb68e888",
+   "split": "dev"
+  },
+  {
+   "id": "bq144",
+   "db": "ncaa_insights",
+   "sha256": "0fb883e732c3e404ece6fdfdc5c201c2d8e33b6f18f500f79994a6e34ecb8464",
+   "split": "dev"
+  },
+  {
+   "id": "bq113",
+   "db": "bls",
+   "sha256": "cb246c7aaa8bc0e982ea558c2af581bf9da993d76ff6b9e5c2187ae3b9228c27",
+   "split": "dev"
+  },
+  {
+   "id": "bq112",
+   "db": "bls",
+   "sha256": "7b7d8e1a3cf0478cf62ac186156143f73e6f182c2e7b5e195197babc8f50a743",
+   "split": "held-out"
+  },
+  {
+   "id": "bq406",
+   "db": "google_dei",
+   "sha256": "fa32f6ce2c9f6ca8696212522166f78a41aeef94755a88fa0f8ae6fbf1d72a4f",
+   "split": "dev"
+  },
+  {
+   "id": "bq022",
+   "db": "chicago",
+   "sha256": "7c1ff54a4111494b0bf2bafc51fbf19fc273b07c07f57e7881b4ccbb52596b80",
+   "split": "dev"
+  },
+  {
+   "id": "bq362",
+   "db": "chicago",
+   "sha256": "11c35cea61529f3c1177483b871587220856d5e56566f2fbf2ade06e8b0f0aa1",
+   "split": "dev"
+  },
+  {
+   "id": "bq363",
+   "db": "chicago",
+   "sha256": "c3c1d8ecd9a65ebc91bb79db74f74b4a79fcffecc8eb1053bbc74bbc1f24ec22",
+   "split": "dev"
+  },
+  {
+   "id": "bq076",
+   "db": "chicago",
+   "sha256": "6afd5668fe74b5481874e46ccc4216a48f3f8a9a84c151ec0b5144394a1c6a15",
+   "split": "dev"
+  },
+  {
+   "id": "bq077",
+   "db": "chicago",
+   "sha256": "6ea481e1d9fa1237c34fd210e8ea8f0d2dd7f19cf8f6232a85535096d33f9fbd",
+   "split": "dev"
+  },
+  {
+   "id": "bq109",
+   "db": "open_targets_genetics_1",
+   "sha256": "3ffaffbac1e1786bcd0dd881eaa5a874192abca783d5b033d689d5fe23d51381",
+   "split": "dev"
+  },
+  {
+   "id": "bq090",
+   "db": "CYMBAL_INVESTMENTS",
+   "sha256": "ad449f6847bbb4b08fb93be6cf617895478e8728f4ea3a6e8fd4932b240536a6",
+   "split": "dev"
+  },
+  {
+   "id": "bq442",
+   "db": "CYMBAL_INVESTMENTS",
+   "sha256": "06b69ffc05d3f55d6476d77424e47320a9dc5a4225d77a3095c2e8c25bf23274",
+   "split": "dev"
+  },
+  {
+   "id": "bq096",
+   "db": "gbif",
+   "sha256": "cfedffcbcbdddca59e11d573bd224e81eba7c0c991a4c58e0166c8c5c72d4643",
+   "split": "dev"
+  },
+  {
+   "id": "bq102",
+   "db": "gnomAD",
+   "sha256": "22e616751c70da73915670e473283da1fd2ce209c49136eb1bce8ff0b28b7ba0",
+   "split": "held-out"
+  },
+  {
+   "id": "bq103",
+   "db": "gnomAD",
+   "sha256": "b97ab27fb067ba6794813fcf27b41e61a98b8341450a86b17197a9b16117eba3",
+   "split": "dev"
+  },
+  {
+   "id": "bq105",
+   "db": "nhtsa_traffic_fatalities_plus",
+   "sha256": "d643ec32b7ebd0ec589aa2f7d0fbf8192649aae32a6a6e2f170abe18f7adec70",
+   "split": "dev"
+  },
+  {
+   "id": "bq396",
+   "db": "nhtsa_traffic_fatalities",
+   "sha256": "13c816563ead93ade8fbab2d266b9533afba66631a49a3f69af7441a53a25f09",
+   "split": "held-out"
+  },
+  {
+   "id": "bq097",
+   "db": "sdoh",
+   "sha256": "301a19820c4f7093fd93cc7ad0ff185700aed9a560927b2f55f1a443bcd54eb8",
+   "split": "dev"
+  },
+  {
+   "id": "bq120",
+   "db": "sdoh",
+   "sha256": "35831162eef012340d80ab75261fb3e5476bb8b10317b4faccfc5100978d0a4c",
+   "split": "dev"
+  },
+  {
+   "id": "bq110",
+   "db": "sdoh",
+   "sha256": "b80781e90c97937ff41a26764923804b108bb725c9789672a8401926050eb935",
+   "split": "held-out"
+  },
+  {
+   "id": "bq395",
+   "db": "sdoh",
+   "sha256": "89cfde60b62c8fa17ba9244c4aa8db80a8f3b03ac134ff4683362ce881417a3e",
+   "split": "dev"
+  },
+  {
+   "id": "bq352",
+   "db": "sdoh",
+   "sha256": "e3121b182686783168c66f624ba89b6358856a371155919b26d946baf707371f",
+   "split": "dev"
+  },
+  {
+   "id": "bq074",
+   "db": "sdoh",
+   "sha256": "49c236a082d1965b272496069f4a7ee44e7e2472744482040c7ac2887119581a",
+   "split": "held-out"
+  },
+  {
+   "id": "bq066",
+   "db": "sdoh",
+   "sha256": "fa5543863ad3e7b83e6b23467d5e3863f59a42f6c731811bef2cbcee6788b0d8",
+   "split": "dev"
+  },
+  {
+   "id": "bq114",
+   "db": "openaq",
+   "sha256": "b35c0284d517ca5d37bf0530c6d0709a5b93c584bc7dc68befdcc78e8789e363",
+   "split": "held-out"
+  },
+  {
+   "id": "bq123",
+   "db": "stackoverflow",
+   "sha256": "6bade2ac2f33063b60f1e7943dc6ca7ba35a96c7e4c8c966f9e51f244f6948a6",
+   "split": "dev"
+  },
+  {
+   "id": "bq280",
+   "db": "stackoverflow",
+   "sha256": "c5daae11af2eff7c4961a2e0564245f024c2ea6c1c40d5a201013c2df5cca710",
+   "split": "dev"
+  },
+  {
+   "id": "bq300",
+   "db": "stackoverflow",
+   "sha256": "9e85f7bac4185002bfb33fed6b15d0a59b4def088d0cebbd4f5a1a337f2f674c",
+   "split": "dev"
+  },
+  {
+   "id": "bq301",
+   "db": "stackoverflow",
+   "sha256": "34a4750edd798fc76ecdc964b728f2784c2f9f4acdb1b071cf243a0ae0a92312",
+   "split": "dev"
+  },
+  {
+   "id": "bq302",
+   "db": "stackoverflow",
+   "sha256": "6b6aec860fe25075c7e852c2b8eba4489c3c5cae77a8f4b25d99876bfeca43c5",
+   "split": "held-out"
+  },
+  {
+   "id": "bq303",
+   "db": "stackoverflow",
+   "sha256": "b872817687f0000fefd7f99a3e26c4c83ebcc27e2d1f03a173651cc58160ce2b",
+   "split": "dev"
+  },
+  {
+   "id": "bq304",
+   "db": "stackoverflow",
+   "sha256": "5148f885e9e20ca6ebc1defe50bba1db054ec41f7f9c35902985aa39ef7db4cc",
+   "split": "dev"
+  },
+  {
+   "id": "bq310",
+   "db": "stackoverflow",
+   "sha256": "f45a5af03754c49f40bf9c14aeb17949d9cd846de3ce9bee885eeccde850eae2",
+   "split": "dev"
+  },
+  {
+   "id": "bq308",
+   "db": "stackoverflow",
+   "sha256": "72671f4fc0c2ac76e469551c5341ddd9373815bf9cd4604b385357042edfe35e",
+   "split": "dev"
+  },
+  {
+   "id": "bq309",
+   "db": "stackoverflow",
+   "sha256": "d710fa7657180069138b5f5dd2923e48dea0b5d4404a5d3d4780b4cbcab75c3b",
+   "split": "dev"
+  },
+  {
+   "id": "bq124",
+   "db": "fhir_synthea",
+   "sha256": "433c0905dfddfd994791ec0c1db8ca7e50fc726efe4cdf40290479041a0f4b8b",
+   "split": "dev"
+  },
+  {
+   "id": "bq126",
+   "db": "the_met",
+   "sha256": "f5fbda612d07803e511af83fbda18d067063e0e1ea0df106e2c84f0475bc1210",
+   "split": "held-out"
+  },
+  {
+   "id": "bq366",
+   "db": "the_met",
+   "sha256": "61197e5af6686636ac9f6a2f2576cdca75761a52f724a34a6049167806673535",
+   "split": "dev"
+  },
+  {
+   "id": "bq414",
+   "db": "the_met",
+   "sha256": "149bc656e9d96fc43b80679819f9ea00fa4e1670775765157eb39a9c022b43bc",
+   "split": "dev"
+  },
+  {
+   "id": "bq204",
+   "db": "eclipse_megamovie",
+   "sha256": "8dcf54faaca70d25d4ddd8bf705e1098843fbc85efd50a01b87b1d849309091a",
+   "split": "held-out"
+  },
+  {
+   "id": "bq389",
+   "db": "epa_historical_air_quality",
+   "sha256": "fa34f27827b5227fdc4839cac8f79d60895d32e83a41229d8daeacd206a953fe",
+   "split": "dev"
+  },
+  {
+   "id": "bq199",
+   "db": "iowa_liquor_sales",
+   "sha256": "67a0de2625b27595e396ebb4c3132eacb9a4a3fb00d4186f58349e314986d2c5",
+   "split": "dev"
+  },
+  {
+   "id": "bq218",
+   "db": "iowa_liquor_sales",
+   "sha256": "13fd99e7187180b8cc87cd3e99da24eec487de72a4f427a5ce8783b2fc6214aa",
+   "split": "dev"
+  },
+  {
+   "id": "bq049",
+   "db": "iowa_liquor_sales_plus",
+   "sha256": "b7c3f30a1a63cc8ac2b8e1d8bc98b397abe590fa0fe9f750d43ed60cca3dd49e",
+   "split": "dev"
+  },
+  {
+   "id": "bq360",
+   "db": "nppes",
+   "sha256": "f7b29fe23af0f1da47127e7ad387314d97806befabc763abef893711b6c35ba5",
+   "split": "dev"
+  },
+  {
+   "id": "bq286",
+   "db": "usa_names",
+   "sha256": "2f185c0756c5e59f9edb1edf385f237aa645930775e60f5c6ec740917b2213ec",
+   "split": "dev"
+  },
+  {
+   "id": "bq143",
+   "db": "CPTAC_PDC",
+   "sha256": "008fff368a41fa3a27596b6ed66375a99de2d004a4abb96ef2de1910658fdab4",
+   "split": "held-out"
+  },
+  {
+   "id": "bq161",
+   "db": "pancancer_atlas_2",
+   "sha256": "96e34bcd1f97b4d6c934b5a06d24152b41d054d87afeafc818d7f3e50b4ed1b4",
+   "split": "held-out"
+  },
+  {
+   "id": "bq151",
+   "db": "pancancer_atlas_2",
+   "sha256": "f26153227fdc6619321f94d814bdd36cf96c4d1d4fd4e3aa24bbf24250238a7a",
+   "split": "dev"
+  },
+  {
+   "id": "bq279",
+   "db": "austin",
+   "sha256": "f2b43f71fc2ff2a78e682a0856bc0b8581bf08edd1cc2d8dddeeb6bd0c8b8024",
+   "split": "dev"
+  },
+  {
+   "id": "bq281",
+   "db": "austin",
+   "sha256": "04f5da1b2ff63b387031f1819d8cd62a19c4156d64070c7a9f932417bdea7505",
+   "split": "held-out"
+  },
+  {
+   "id": "bq282",
+   "db": "austin",
+   "sha256": "e9ae45a180eb33df41a32236ad04582f52d720bdfd14369936b198571f3897af",
+   "split": "dev"
+  },
+  {
+   "id": "bq006",
+   "db": "austin",
+   "sha256": "ef00ddf8549f891483ff3a46d3abb5df4fdcc990b8c14ced538f3e0bc852e971",
+   "split": "dev"
+  },
+  {
+   "id": "bq284",
+   "db": "bbc",
+   "sha256": "a87a5d1f021a1dceeb4c33ef9c8d646e4b043f946261cfaf186fcc48e532efb6",
+   "split": "dev"
+  },
+  {
+   "id": "bq413",
+   "db": "dimensions_ai_covid19",
+   "sha256": "11ba3f6aec7a236b6d36df92cfea0ab78c004e4dc2f7c3403e74870f218838d0",
+   "split": "dev"
+  },
+  {
+   "id": "bq425",
+   "db": "ebi_chembl",
+   "sha256": "f5058d1828b9fd0af9b6b7da68eb6a886ac4165db88b232bb81d45a89c3dbb7e",
+   "split": "dev"
+  },
+  {
+   "id": "bq430",
+   "db": "ebi_chembl",
+   "sha256": "829e1a3d124f3d049e9bef07ff4fd45208613a12981cc28e42d4c6b58863227a",
+   "split": "dev"
+  },
+  {
+   "id": "bq285",
+   "db": "fda",
+   "sha256": "2c7624b67fcd97f535560eff79b145c9a6ffb2daf6818338b3e4a4dcd42ff946",
+   "split": "held-out"
+  },
+  {
+   "id": "bq330",
+   "db": "fda",
+   "sha256": "d7f1d0e21a7099d3928c3b0fbd75d4b6f779d465b010b62e567225e806188490",
+   "split": "dev"
+  },
+  {
+   "id": "bq398",
+   "db": "world_bank",
+   "sha256": "7f510c8d11004877aedebe59a9115a5b77a406ef42f685ed95a02207f8df2bf2",
+   "split": "dev"
+  },
+  {
+   "id": "bq399",
+   "db": "world_bank",
+   "sha256": "94e22e0b9ca3ef1bf9cb2d44c1fe80f791a9d901628cf05dd6b2c140dd726b61",
+   "split": "dev"
+  },
+  {
+   "id": "bq227",
+   "db": "london",
+   "sha256": "ca93ace0c60e0ff65cb5c1439299e16f32ee6de92a904025d010834575bbfd57",
+   "split": "dev"
+  },
+  {
+   "id": "bq232",
+   "db": "london",
+   "sha256": "5c5580cfe4583416bc3cf015dedb483263912404884eaefb2a0d8c526ebeb8e2",
+   "split": "held-out"
+  },
+  {
+   "id": "bq228",
+   "db": "london",
+   "sha256": "728291d0f8c409ddd4fc7d8d8173c935acef2927085447696a5240408ef84631",
+   "split": "dev"
+  },
+  {
+   "id": "bq424",
+   "db": "world_bank",
+   "sha256": "495443dc6a9b20d58c241656cdbd4fe5eaa6b473d41c06946ac2000492b4f077",
+   "split": "held-out"
+  },
+  {
+   "id": "bq327",
+   "db": "world_bank",
+   "sha256": "16b2cb201415853d5063834a50d8cb880c44ba2d600fbad7fece8c03e1b830f3",
+   "split": "held-out"
+  },
+  {
+   "id": "bq328",
+   "db": "world_bank",
+   "sha256": "3b03bebe0118368669b43ebbc869cf937ab016ac4b0dd00808f6ebc1a72dfc27",
+   "split": "dev"
+  },
+  {
+   "id": "bq403",
+   "db": "irs_990",
+   "sha256": "fc12a46b4be1b2c498514b8deecddc1aaf4df62937df5b39352aed5d4cf07672",
+   "split": "dev"
+  },
+  {
+   "id": "bq397",
+   "db": "ecommerce",
+   "sha256": "adec416b390e2d72292f938fd337a0982f8cd980fa28d7fb83b727588c04226c",
+   "split": "dev"
+  },
+  {
+   "id": "bq402",
+   "db": "ecommerce",
+   "sha256": "33417dc954a87cc8b363e791ed55b5c6c928e16f2d580ec679ee7aba861a1308",
+   "split": "dev"
+  },
+  {
+   "id": "ga001",
+   "db": "ga4",
+   "sha256": "13f67c5276e464a65772531c905573857e1145e1b714e155a81ecff39685a0d5",
+   "split": "held-out"
+  },
+  {
+   "id": "ga002",
+   "db": "ga4",
+   "sha256": "c34401327f75ce045dd62de48ecf6f999f78c0577108482597506d02cb43780a",
+   "split": "dev"
+  },
+  {
+   "id": "ga003",
+   "db": "firebase",
+   "sha256": "4412a717f99dd880f42a92e4bc6221655fb4239d2222ee006f0bd49753f9cd34",
+   "split": "dev"
+  },
+  {
+   "id": "ga004",
+   "db": "ga4",
+   "sha256": "d0a2611c4242241219b8626d1baf4122586bf08bfeed46fd0dded5d8d528a149",
+   "split": "dev"
+  },
+  {
+   "id": "ga008",
+   "db": "ga4",
+   "sha256": "181b181c1271989809371cd9f2904e0cf7b8e68097e0b8b8e42c056a02e9e4d2",
+   "split": "held-out"
+  },
+  {
+   "id": "ga017",
+   "db": "ga4",
+   "sha256": "bbe8ac5eef33bba9d000fac735f4be9c514d754cf51c167a4bdc59fd76acabfe",
+   "split": "held-out"
+  },
+  {
+   "id": "ga018",
+   "db": "ga4",
+   "sha256": "94348e0f45b955c20f89f49aaf0503bdff7f9a5fa1b9c055703f83564316404e",
+   "split": "dev"
+  },
+  {
+   "id": "ga010",
+   "db": "ga4",
+   "sha256": "fe486d590a47a74ccdc1cf9f927b7c07b5dd85f934c554107e99308f29f7b976",
+   "split": "dev"
+  },
+  {
+   "id": "ga012",
+   "db": "ga4",
+   "sha256": "344a008a62d315556c4abfb2036f781370f66c70078548748628c84a08e44824",
+   "split": "held-out"
+  },
+  {
+   "id": "ga019",
+   "db": "firebase",
+   "sha256": "fdb6df2ca8db5266b084149deca8d68472308cfd7b9c7503e3436f3ee96d6ee4",
+   "split": "dev"
+  },
+  {
+   "id": "ga028",
+   "db": "firebase",
+   "sha256": "0d48be10633fd986ef477c46c0f4a26f420f6a0991b4583a3c4704dc101b6261",
+   "split": "dev"
+  },
+  {
+   "id": "ga020",
+   "db": "firebase",
+   "sha256": "7e4c2b8e0f770c3b95f7a6e9d8b7c65bb3a3d0fc44e6cf8d5f1998e6ff5f64f9",
+   "split": "dev"
+  },
+  {
+   "id": "ga021",
+   "db": "firebase",
+   "sha256": "930dfb7f47ac8b2565ff70d2d3815b33b3ce3090b2bd91f6365c109ffc77ec3f",
+   "split": "dev"
+  },
+  {
+   "id": "ga022",
+   "db": "firebase",
+   "sha256": "2c25b227469471737b9734e4181bbe6ab9bf272ddf572c02e3cb93b1c01a9687",
+   "split": "dev"
+  }
+ ]
+}

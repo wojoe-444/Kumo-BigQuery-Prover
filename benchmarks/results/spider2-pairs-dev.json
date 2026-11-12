@@ -1,0 +1,1071 @@
+{
+ "split": "dev",
+ "queries": 112,
+ "queries_by_status": {
+  "ok": 80,
+  "analysis-error": 24,
+  "unsupported": 8
+ },
+ "queries_left_empty_on_every_database": 31,
+ "pairs": 1031,
+ "pairs_by_kind_and_oracle": {
+  "mutation/agreed": 308,
+  "mutation/not-run": 36,
+  "mutation/refuted": 123,
+  "mutation/untrusted": 167,
+  "rewrite/agreed": 388,
+  "rewrite/not-run": 9
+ },
+ "labels": {
+  "equivalent": 397,
+  "unlabelled": 511,
+  "not_equivalent": 123
+ },
+ "rewrite_refuted": [],
+ "false_proofs": [],
+ "static_verdict_on_rewrites": {
+  "unknown": 286,
+  "proven": 111
+ },
+ "static_proved_by_layer": {
+  "structural": 35,
+  "smt": 53,
+  "algebraic": 31,
+  "identical": 1
+ },
+ "databases_per_query": 20,
+ "does_not_run": {
+  "unsupported: function ST_GEOGPOINT is not supported by the emulator": 4,
+  "analysis-error: failed to scan rows: zero divided error ( 0.000000 / 0 )": 4,
+  "analysis-error: No matching signature for operator /\\n Argument types: INT64, STRUCT\\u003cmidyear_population DOUBLE, country_code STRING, year INT64\\u003e\\n Signature: DOUBLE /": 2,
+  "unsupported: function ST_AREA is not supported by the emulator": 2,
+  "analysis-error: failed to parse statements: failed to parse statement: Syntax error: Expected ": 2,
+  "analysis-error: No matching signature for aggregate function AVG\\n Argument types: STRING\\n Signature: AVG(INT64)\\n Argument 1: Unable to coerce type STRING to expected type IN": 2,
+  "analysis-error: No matching signature for function ST_DISTANCE\\n Argument types: STRING, STRING\\n Signature: ST_DISTANCE(GEOGRAPHY, GEOGRAPHY, [BOOL])\\n Argument 1: Unable to c": 1,
+  "analysis-error: Unrecognized name: geo_id [at 1:125]": 1,
+  "analysis-error: No matching signature for aggregate function SUM\\n Argument types: STRING\\n Signature: SUM(INT64)\\n Argument 1: Unable to coerce type STRING to expected type IN": 1,
+  "analysis-error: Unrecognized name: geoid [at 1:381]": 1,
+  "analysis-error: No matching signature for function TIMESTAMP_DIFF\\n Argument types: STRING, DATETIME, DATE_TIME_PART\\n Signature: TIMESTAMP_DIFF(TIMESTAMP, TIMESTAMP, DATE_TIME": 1,
+  "analysis-error: Cannot access field code on a value with type STRING [at 1:454]": 1,
+  "analysis-error: No matching signature for function DATE_ADD for argument types: STRING, INTERVAL INT64 DATE_TIME_PART\\n Signature: DATE_ADD(DATE, INTERVAL INT64 DATE_TIME_PART)": 1,
+  "analysis-error: Unrecognized name: ParticipantBarcode [at 1:286]": 1,
+  "analysis-error: Column name station_id is ambiguous [at 1:68]": 1,
+  "analysis-error: failed to parse statements: failed to parse statement: Syntax error: Unexpected ": 1,
+  "unsupported: function ST_INTERSECTS is not supported by the emulator": 1,
+  "analysis-error: Column name date_string is ambiguous [at 1:458]": 1,
+  "unsupported: Create statement in the script": 1,
+  "analysis-error: No matching signature for function FORMAT_TIMESTAMP\\n Argument types: STRING, STRING\\n Signature: FORMAT_TIMESTAMP(STRING, TIMESTAMP, [STRING])\\n Argument 2: Un": 1,
+  "analysis-error: Unrecognized name: state [at 1:150]": 1,
+  "analysis-error: No matching signature for operator BETWEEN\\n Argument types: STRING, INT64, INT64\\n Signature: (INT64) BETWEEN (UINT64) AND (UINT64)\\n Argument 1: Unable to coe": 1
+ },
+ "queries_detail": [
+  {
+   "case_id": "bq002",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 18,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 32.8
+  },
+  {
+   "case_id": "bq003",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 3,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 33.7
+  },
+  {
+   "case_id": "bq006",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 5,
+   "databases_failed": 6,
+   "base_error": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "seconds": 15.1
+  },
+  {
+   "case_id": "bq008",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 128.4
+  },
+  {
+   "case_id": "bq009",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 15,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 21.1
+  },
+  {
+   "case_id": "bq011",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 53.5
+  },
+  {
+   "case_id": "bq018",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 14,
+   "databases_failed": 2,
+   "base_error": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "seconds": 24.7
+  },
+  {
+   "case_id": "bq022",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 24.6
+  },
+  {
+   "case_id": "bq025",
+   "status": "analysis-error",
+   "reason": "No matching signature for operator /\\n Argument types: INT64, STRUCT\\u003cmidyear_population DOUBLE, country_code STRING, year INT64\\u003e\\n Signature: DOUBLE /",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.5
+  },
+  {
+   "case_id": "bq031",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 60.2
+  },
+  {
+   "case_id": "bq032",
+   "status": "unsupported",
+   "reason": "function ST_GEOGPOINT is not supported by the emulator",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.2
+  },
+  {
+   "case_id": "bq034",
+   "status": "unsupported",
+   "reason": "function ST_GEOGPOINT is not supported by the emulator",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.2
+  },
+  {
+   "case_id": "bq035",
+   "status": "unsupported",
+   "reason": "function ST_GEOGPOINT is not supported by the emulator",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.2
+  },
+  {
+   "case_id": "bq042",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 26.1
+  },
+  {
+   "case_id": "bq045",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 84.5
+  },
+  {
+   "case_id": "bq049",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 47.0
+  },
+  {
+   "case_id": "bq053",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 18,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 61.4
+  },
+  {
+   "case_id": "bq059",
+   "status": "analysis-error",
+   "reason": "No matching signature for function ST_DISTANCE\\n Argument types: STRING, STRING\\n Signature: ST_DISTANCE(GEOGRAPHY, GEOGRAPHY, [BOOL])\\n Argument 1: Unable to c",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.7
+  },
+  {
+   "case_id": "bq060",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 8,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 33.5
+  },
+  {
+   "case_id": "bq061",
+   "status": "analysis-error",
+   "reason": "Unrecognized name: geo_id [at 1:125]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.6
+  },
+  {
+   "case_id": "bq064",
+   "status": "unsupported",
+   "reason": "function ST_AREA is not supported by the emulator",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.2
+  },
+  {
+   "case_id": "bq066",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 71.8
+  },
+  {
+   "case_id": "bq076",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 9,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 30.0
+  },
+  {
+   "case_id": "bq077",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 15,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 34.7
+  },
+  {
+   "case_id": "bq085",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 39.3
+  },
+  {
+   "case_id": "bq086",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 6,
+   "databases_failed": 6,
+   "base_error": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "seconds": 26.1
+  },
+  {
+   "case_id": "bq087",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 29.4
+  },
+  {
+   "case_id": "bq088",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 27.4
+  },
+  {
+   "case_id": "bq089",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 23.7
+  },
+  {
+   "case_id": "bq090",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 26.6
+  },
+  {
+   "case_id": "bq096",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 37.2
+  },
+  {
+   "case_id": "bq097",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 33.6
+  },
+  {
+   "case_id": "bq103",
+   "status": "analysis-error",
+   "reason": "No matching signature for aggregate function SUM\\n Argument types: STRING\\n Signature: SUM(INT64)\\n Argument 1: Unable to coerce type STRING to expected type IN",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.4
+  },
+  {
+   "case_id": "bq105",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 14,
+   "databases_failed": 4,
+   "base_error": "failed to scan rows: zero divided error ( 1.000000 / 0 )",
+   "seconds": 76.1
+  },
+  {
+   "case_id": "bq109",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 37.4
+  },
+  {
+   "case_id": "bq113",
+   "status": "analysis-error",
+   "reason": "Unrecognized name: geoid [at 1:381]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.8
+  },
+  {
+   "case_id": "bq115",
+   "status": "analysis-error",
+   "reason": "No matching signature for operator /\\n Argument types: INT64, STRUCT\\u003cmidyear_population DOUBLE, country_code STRING, year INT64\\u003e\\n Signature: DOUBLE /",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.5
+  },
+  {
+   "case_id": "bq119",
+   "status": "unsupported",
+   "reason": "function ST_GEOGPOINT is not supported by the emulator",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.2
+  },
+  {
+   "case_id": "bq120",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 9,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 36.5
+  },
+  {
+   "case_id": "bq123",
+   "status": "analysis-error",
+   "reason": "No matching signature for function TIMESTAMP_DIFF\\n Argument types: STRING, DATETIME, DATE_TIME_PART\\n Signature: TIMESTAMP_DIFF(TIMESTAMP, TIMESTAMP, DATE_TIME",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 1.3
+  },
+  {
+   "case_id": "bq124",
+   "status": "analysis-error",
+   "reason": "Cannot access field code on a value with type STRING [at 1:454]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.6
+  },
+  {
+   "case_id": "bq130",
+   "status": "analysis-error",
+   "reason": "No matching signature for function DATE_ADD for argument types: STRING, INTERVAL INT64 DATE_TIME_PART\\n Signature: DATE_ADD(DATE, INTERVAL INT64 DATE_TIME_PART)",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 1.1
+  },
+  {
+   "case_id": "bq144",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 68.5
+  },
+  {
+   "case_id": "bq151",
+   "status": "analysis-error",
+   "reason": "Unrecognized name: ParticipantBarcode [at 1:286]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.5
+  },
+  {
+   "case_id": "bq172",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 15,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 23.5
+  },
+  {
+   "case_id": "bq185",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 36.0
+  },
+  {
+   "case_id": "bq198",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 19,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 37.8
+  },
+  {
+   "case_id": "bq199",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 35.4
+  },
+  {
+   "case_id": "bq203",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 19,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 47.3
+  },
+  {
+   "case_id": "bq218",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 36.1
+  },
+  {
+   "case_id": "bq227",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 15,
+   "databases_failed": 3,
+   "base_error": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "seconds": 30.2
+  },
+  {
+   "case_id": "bq228",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 17,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 30.9
+  },
+  {
+   "case_id": "bq234",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 28.2
+  },
+  {
+   "case_id": "bq235",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 2,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 37.4
+  },
+  {
+   "case_id": "bq268",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 55.9
+  },
+  {
+   "case_id": "bq269",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 19,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 41.5
+  },
+  {
+   "case_id": "bq270",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 13,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 48.6
+  },
+  {
+   "case_id": "bq275",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 20,
+   "base_error": "failed to scan rows: error parsing [a] with format [%Y%m%d]: could not parse year: leading character is not a digit",
+   "seconds": 17.1
+  },
+  {
+   "case_id": "bq279",
+   "status": "analysis-error",
+   "reason": "Column name station_id is ambiguous [at 1:68]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 1.2
+  },
+  {
+   "case_id": "bq280",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 15,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 53.5
+  },
+  {
+   "case_id": "bq282",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 49.3
+  },
+  {
+   "case_id": "bq284",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 48.5
+  },
+  {
+   "case_id": "bq286",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 5,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 26.0
+  },
+  {
+   "case_id": "bq290",
+   "status": "analysis-error",
+   "reason": "failed to parse statements: failed to parse statement: Syntax error: Unexpected ",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.7
+  },
+  {
+   "case_id": "bq300",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 16,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 54.1
+  },
+  {
+   "case_id": "bq301",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 59.8
+  },
+  {
+   "case_id": "bq303",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 86.6
+  },
+  {
+   "case_id": "bq304",
+   "status": "analysis-error",
+   "reason": "failed to parse statements: failed to parse statement: Syntax error: Expected ",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.3
+  },
+  {
+   "case_id": "bq308",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 43.3
+  },
+  {
+   "case_id": "bq309",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 8,
+   "databases_failed": 10,
+   "base_error": "failed to scan rows: zero divided error ( 1.500000 / 0 )",
+   "seconds": 56.0
+  },
+  {
+   "case_id": "bq310",
+   "status": "analysis-error",
+   "reason": "failed to parse statements: failed to parse statement: Syntax error: Expected ",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.3
+  },
+  {
+   "case_id": "bq328",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 11,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 49.5
+  },
+  {
+   "case_id": "bq330",
+   "status": "unsupported",
+   "reason": "function ST_AREA is not supported by the emulator",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.2
+  },
+  {
+   "case_id": "bq339",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 25.6
+  },
+  {
+   "case_id": "bq352",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 4,
+   "databases_failed": 8,
+   "base_error": "failed to scan rows: zero divided error ( 1.500000 / 0 )",
+   "seconds": 28.5
+  },
+  {
+   "case_id": "bq354",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 133.0
+  },
+  {
+   "case_id": "bq357",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 18.0
+  },
+  {
+   "case_id": "bq360",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 4,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 31.5
+  },
+  {
+   "case_id": "bq362",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 27.1
+  },
+  {
+   "case_id": "bq363",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 14,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 19.9
+  },
+  {
+   "case_id": "bq366",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 52.6
+  },
+  {
+   "case_id": "bq374",
+   "status": "analysis-error",
+   "reason": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.4
+  },
+  {
+   "case_id": "bq376",
+   "status": "unsupported",
+   "reason": "function ST_INTERSECTS is not supported by the emulator",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.2
+  },
+  {
+   "case_id": "bq383",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 4,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 141.7
+  },
+  {
+   "case_id": "bq389",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 103.5
+  },
+  {
+   "case_id": "bq392",
+   "status": "analysis-error",
+   "reason": "Column name date_string is ambiguous [at 1:458]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.4
+  },
+  {
+   "case_id": "bq395",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 4,
+   "databases_failed": 1,
+   "base_error": "failed to scan rows: zero divided error ( 3.000000 / 0 )",
+   "seconds": 23.2
+  },
+  {
+   "case_id": "bq397",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 20,
+   "base_error": "failed to scan rows: strconv.ParseFloat: parsing ",
+   "seconds": 6.0
+  },
+  {
+   "case_id": "bq398",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 9,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 50.3
+  },
+  {
+   "case_id": "bq399",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 17,
+   "base_error": "failed to scan rows: error parsing [a] with format [%Y]: could not parse year: leading character is not a digit",
+   "seconds": 13.0
+  },
+  {
+   "case_id": "bq400",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 1,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 79.6
+  },
+  {
+   "case_id": "bq402",
+   "status": "analysis-error",
+   "reason": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.3
+  },
+  {
+   "case_id": "bq403",
+   "status": "analysis-error",
+   "reason": "No matching signature for aggregate function AVG\\n Argument types: STRING\\n Signature: AVG(INT64)\\n Argument 1: Unable to coerce type STRING to expected type IN",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.4
+  },
+  {
+   "case_id": "bq406",
+   "status": "unsupported",
+   "reason": "Create statement in the script",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.2
+  },
+  {
+   "case_id": "bq407",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 6,
+   "databases_failed": 2,
+   "base_error": "failed to scan rows: zero divided error ( 100.000000 / 0 )",
+   "seconds": 27.8
+  },
+  {
+   "case_id": "bq413",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 13,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 37.2
+  },
+  {
+   "case_id": "bq414",
+   "status": "analysis-error",
+   "reason": "No matching signature for function FORMAT_TIMESTAMP\\n Argument types: STRING, STRING\\n Signature: FORMAT_TIMESTAMP(STRING, TIMESTAMP, [STRING])\\n Argument 2: Un",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.5
+  },
+  {
+   "case_id": "bq419",
+   "status": "analysis-error",
+   "reason": "Unrecognized name: state [at 1:150]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 2.2
+  },
+  {
+   "case_id": "bq425",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 7,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 84.5
+  },
+  {
+   "case_id": "bq428",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 42.8
+  },
+  {
+   "case_id": "bq430",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 159.5
+  },
+  {
+   "case_id": "bq442",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 14.7
+  },
+  {
+   "case_id": "ga002",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 40.6
+  },
+  {
+   "case_id": "ga003",
+   "status": "analysis-error",
+   "reason": "No matching signature for aggregate function AVG\\n Argument types: STRING\\n Signature: AVG(INT64)\\n Argument 1: Unable to coerce type STRING to expected type IN",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.4
+  },
+  {
+   "case_id": "ga004",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 47.0
+  },
+  {
+   "case_id": "ga010",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 68.0
+  },
+  {
+   "case_id": "ga018",
+   "status": "analysis-error",
+   "reason": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.5
+  },
+  {
+   "case_id": "ga019",
+   "status": "analysis-error",
+   "reason": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.5
+  },
+  {
+   "case_id": "ga020",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 46.3
+  },
+  {
+   "case_id": "ga021",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 45.5
+  },
+  {
+   "case_id": "ga022",
+   "status": "analysis-error",
+   "reason": "No matching signature for operator BETWEEN\\n Argument types: STRING, INT64, INT64\\n Signature: (INT64) BETWEEN (UINT64) AND (UINT64)\\n Argument 1: Unable to coe",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.4
+  },
+  {
+   "case_id": "ga028",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 90.0
+  }
+ ]
+}

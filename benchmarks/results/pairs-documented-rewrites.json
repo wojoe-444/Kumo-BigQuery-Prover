@@ -2,12 +2,19 @@
   "eval": "pairs-documented-rewrites",
   "status": "measured",
   "size": 25,
-  "score": "equivalent: 19 of 19 not refuted; not equivalent: 4 of 6 refuted, 1 missed, 1 invalid in BigQuery",
-  "proved": 0,
+  "score": "equivalent: 18 of 19 proved, 0 refuted; not equivalent: 2 of 6 refuted, 2 demoted by the guard (refuted on the emulator, UNKNOWN reported), 1 missed, 1 invalid in BigQuery",
+  "proved": 18,
   "wrong": 0,
   "date": "2026-11-12",
   "emulator": "goccy/bigquery-emulator v0.8.1",
   "command": "python tools/run_pairs_eval.py documented-rewrites --databases 8",
-  "baseline": "without literal harvesting (--no-harvest): 1 of 6 refuted, 4 missed (2026-11-11)",
-  "caveats": "Refutation only: nothing is proved yet. 8 seeded random databases per case, data seeded with the constants in each pair's queries (never its label). The 3 new refutations were checked by hand against each case's note. One case (R012b-09, `= NULL`) is rejected by real BigQuery. Development set, no held-out split."
+  "baseline": "before the proof layers (refutation only, with literal harvesting): 0 proved, 4 of 6 refuted (2026-11-12 morning)",
+  "caveats": "Proofs come from the layers ported from Kumo_SQL_Prover (docs/ported-layers.md). Every proved pair also ran on 8 seeded databases on the emulator: none was refuted. The one equivalent pair not proved is R012b-17. R012b-09 (`= NULL`) is rejected by real BigQuery, so it is not scoreable. Development set with no held-out split; the earlier prover's rules were tuned on these 25 pairs, so the ported layers inherit that exposure (tuned on test).",
+  "proof_layers": {
+    "identical": 3,
+    "structural": 1,
+    "algebraic": 14
+  },
+  "false_proofs": 0,
+  "guard": "With the trust guard (docs/emulator-gaps.md): R012-037 (BETWEEN) and R012-042 (SUBSTRING, LIKE) are demoted. Before the guard: 4 of 6 refuted. Proofs are unchanged (18 proved, 0 false proofs): a proved pair still runs on the databases without the guard."
 }

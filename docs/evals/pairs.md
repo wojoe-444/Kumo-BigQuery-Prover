@@ -20,7 +20,25 @@ The default run seeds the databases with the constants found in each pair's quer
 | Numeric traps, harvesting | 61 | 1 | 3 | 12 | 13 | 1 |
 | Numeric traps, harvesting and `--specials` (tuned on test) | 60 | 2 | 3 | 13 | 12 | 1 |
 
-Nothing is proved yet: the static layer only recognises identical queries. These are refutation scores, results files `benchmarks/results/pairs-*.json`.
+These are refutation scores (before the proof layers were added), results files `benchmarks/results/pairs-*.json`. Proofs are in the next section.
+
+## Proofs (2026-11-12)
+
+With the layers from [ported-layers.md](../ported-layers.md), `tools/run_pairs_eval.py` proves what it can before running anything, then runs every pair on the 8 databases anyway, so the emulator checks the proofs. Same emulator, same data.
+
+| Corpus | Equivalent: proved | Proved under a disclosed assumption (counted unknown) | Equivalent: not proved | False proofs |
+|---|---|---|---|---|
+| Documented rewrites (19 equivalent) | 18 (3 identical, 1 structural, 14 algebraic) | 0 | 1 | 0 |
+| Numeric traps (65 equivalent) | 51 (3 identical, 2 structural, 44 algebraic, 2 SMT) | 8 float-sum pairs | 5, and 1 refuted by the emulator's CAST bug | 0 |
+
+The 26 different-labelled numeric pairs: 12 refuted, 10 missed, and 3 NaN pairs that the prover proves only under its no-NaN assumption (disclosed, counted unknown, not wrong). 21 error-class pairs stay unscored. Refutation counts did not change.
+
+What the proof run found, which is the reason to keep the detector:
+- **A false proof inherited from Kumo_SQL_Prover** (window pruning, a global aggregate inside a window), found by a ported test, not by the corpora. Fixed in the port.
+- **A second one the corpora found:** `float-sum-pre-aggregated` was proved by the algebraic layer, which regroups FLOAT64 partial sums as if addition were associative. The emulator did not refute it on random data (it needs 1e16 beside small values); the label did. The algebraic layer is now skipped for any pair that may sum a FLOAT64, which costs the proofs of the float-sum pairs (the SMT layer proves some of them under the disclosed order assumption).
+- **Two proofs withheld on purpose:** `int-sum-pre-aggregated` and `float-avg-versus-sum-over-count`, because the layer proved the rows equal but could not compare runtime errors.
+
+**Limits:** the layers' rules were tuned on these corpora in the earlier prover (tuned on test), so these counts measure recall on development data, not generalisation. The emulator can only refute on data it can build, and it cannot hold NaN or -0.0.
 
 ## What the runs found
 
@@ -51,3 +69,14 @@ It moved documented rewrites from 1 to 4 refuted and numeric traps from 11 to 12
 **Remaining misses (12 with specials):** five need NaN or -0.0 in the data, which the emulator cannot hold (NaN reads back as NULL, -0.0 as 0.0, and `CAST('NaN' AS FLOAT64)` in an INSERT fails to format). Two (`cast-versus-trunc`, `div-versus-cast`) hide behind the emulator's truncating CAST. Three need two NUMERIC columns at 0.000000001 in one row, which a random draw rarely gives. The last two need a float-sum regrouping or a NUMERIC beyond float range.
 
 **Limits:** results are compared as multisets, so a pair that differs only in row order counts as agreeing. Both queries raising an error on the same database counts as an error, not an agreement. A refutation is only as good as the emulator's answer on that construct, which is why every WRONG is looked at by hand before anything else.
+
+## The guard
+
+Since the [GoogleSQL compliance run](googlesql-compliance.md) the oracle reports UNKNOWN, not REFUTED, when two queries differ on a construct or a value the emulator is known to get wrong ([../emulator-gaps.md](../emulator-gaps.md)). `run_pairs_eval.py` counts such a pair as **demoted** (refuted on the emulator but not trusted); an equivalent pair the emulator wrongly refutes and the guard demotes is counted `ok`. A pair a static layer proved runs without the guard, so a difference the emulator finds on a proof still surfaces as a false proof.
+
+What changed (8 databases per pair, harvesting on, no specials, the same proofs as above):
+- **Documented rewrites:** 4 refuted became 2 refuted and 2 demoted. `R012-037` is demoted because it uses `BETWEEN` (NULL bounds are a measured gap), `R012-042` because it uses `SUBSTRING` and `LIKE`. Both were real differences when read by hand; the guard cannot tell, so it does not report them.
+- **Numeric traps:** 12 refuted became 11 refuted and 1 demoted (`safe-divide-versus-filter`, `SAFE_DIVIDE` with a result past 1e18). The one equivalent pair the emulator refuted, `cast-versus-round` (`CAST(FLOAT64 AS INT64)` truncates), is now demoted because `CAST(... AS INT64)` is on the untrusted list, so the corpus has 0 wrong again.
+- **Data generator:** the base FLOAT64 pool no longer holds 1e308; databases with odd seeds add it (`extremes=True`). A refutation that rests on 1e308 is demoted by the value check, and half the databases are free of it so an ordinary counterexample can still be found. This change and the guard moved the scores together; the table does not separate them.
+
+The loss is the price of a refutation BigQuery would not reproduce: a demoted pair stays UNKNOWN until the emulator is fixed or the construct is shown safe some other way.

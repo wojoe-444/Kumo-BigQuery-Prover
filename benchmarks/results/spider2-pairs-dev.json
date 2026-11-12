@@ -24,14 +24,13 @@
  "rewrite_refuted": [],
  "false_proofs": [],
  "static_verdict_on_rewrites": {
-  "unknown": 286,
-  "proven": 111
+  "unknown": 287,
+  "proven": 110
  },
  "static_proved_by_layer": {
   "structural": 35,
   "smt": 53,
-  "algebraic": 31,
-  "identical": 1
+  "algebraic": 31
  },
  "databases_per_query": 20,
  "does_not_run": {

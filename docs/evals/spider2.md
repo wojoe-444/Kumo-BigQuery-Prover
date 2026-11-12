@@ -57,9 +57,9 @@ Each cell is the recorded run before this builder, then after. Development: 112 
 | Pairs | 1,031 | 311 |
 | Rewrites (equivalent by construction) | 397 | 127 |
 | Rewrites refuted by the oracle | 0 | 0 |
-| Rewrites proved by the static layers | 111 | 57 |
+| Rewrites proved by the static layers | 110 | 57 |
 | Rewrites on a query that never returns rows | 170 → 27 | 59 → 5 |
-| Proved rewrites on a query that returns rows | 74 → 108 | 36 → 56 |
+| Proved rewrites on a query that returns rows | 74 → 107 | 36 → 56 |
 | Mutations | 634 | 184 |
 | Mutations refuted, `not_equivalent` with a witness | 123 → 141 | 25 → 27 |
 | Mutations whose difference the trust guard withheld | 167 → 265 | 58 → 104 |
@@ -67,7 +67,7 @@ Each cell is the recorded run before this builder, then after. Development: 112 
 | Pairs proved although the emulator refuted them | 0 | 0 |
 | Databases (of 20 per query) on which the original returns rows, all queries | 654 → 1,154 | 155 → 338 |
 
-The static layers proved rewrites mostly of the wrapper kinds (CTE rename, CTE wrap) and of operand order; on the development split 108 of the 111 proofs are now on queries that return rows (74 before: the others were proofs of nothing). The proof layers are what this corpus is for: 286 of 397 development rewrites are still unproved, and each is equivalent by construction.
+The static layers proved rewrites mostly of the wrapper kinds (CTE rename, CTE wrap) and of operand order; on the development split 107 of the 110 proofs are now on queries that return rows (74 before: the others were proofs of nothing). The proof layers are what this corpus is for: 287 of 397 development rewrites are still unproved, and each is equivalent by construction. The static verdicts were re-scored against the static layers on `main` after the runs: the current layers no longer prove one development pair (`bq430-06`, `COALESCE` written as `IFNULL`; 111 proofs before the re-score), and no other verdict changed.
 
 **The builder was made on the development split only.** The held-out file was regenerated once with the final code. No held-out query was read for this work; the exposure recorded before (`bq001`, `bq004`) is unchanged.
 

@@ -71,3 +71,14 @@ It moved documented rewrites from 1 to 4 refuted and numeric traps from 11 to 12
 **Remaining misses (12 with specials):** five need NaN or -0.0 in the data, which the emulator cannot hold (NaN reads back as NULL, -0.0 as 0.0, and `CAST('NaN' AS FLOAT64)` in an INSERT fails to format). Two (`cast-versus-trunc`, `div-versus-cast`) hide behind the emulator's truncating CAST. Three need two NUMERIC columns at 0.000000001 in one row, which a random draw rarely gives. The last two need a float-sum regrouping or a NUMERIC beyond float range.
 
 **Limits:** results are compared as multisets, so a pair that differs only in row order counts as agreeing. Both queries raising an error on the same database counts as an error, not an agreement. A refutation is only as good as the emulator's answer on that construct, which is why every WRONG is looked at by hand before anything else.
+
+## The guard
+
+Since the [GoogleSQL compliance run](googlesql-compliance.md) the oracle reports UNKNOWN, not REFUTED, when two queries differ on a construct or a value the emulator is known to get wrong ([../emulator-gaps.md](../emulator-gaps.md)). `run_pairs_eval.py` counts such a pair as **demoted** (refuted on the emulator but not trusted); an equivalent pair the emulator wrongly refutes and the guard demotes is counted `ok`. A pair a static layer proved runs without the guard, so a difference the emulator finds on a proof still surfaces as a false proof.
+
+What changed (8 databases per pair, harvesting on, no specials, the same proofs as above):
+- **Documented rewrites:** 4 refuted became 2 refuted and 2 demoted. `R012-037` is demoted because it uses `BETWEEN` (NULL bounds are a measured gap), `R012-042` because it uses `SUBSTRING` and `LIKE`. Both were real differences when read by hand; the guard cannot tell, so it does not report them.
+- **Numeric traps:** 12 refuted became 11 refuted and 1 demoted (`safe-divide-versus-filter`, `SAFE_DIVIDE` with a result past 1e18). The one equivalent pair the emulator refuted, `cast-versus-round` (`CAST(FLOAT64 AS INT64)` truncates), is now demoted because `CAST(... AS INT64)` is on the untrusted list, so the corpus has 0 wrong again.
+- **Data generator:** the base FLOAT64 pool no longer holds 1e308; databases with odd seeds add it (`extremes=True`). A refutation that rests on 1e308 is demoted by the value check, and half the databases are free of it so an ordinary counterexample can still be found. This change and the guard moved the scores together; the table does not separate them.
+
+The loss is the price of a refutation BigQuery would not reproduce: a demoted pair stays UNKNOWN until the emulator is fixed or the construct is shown safe some other way.

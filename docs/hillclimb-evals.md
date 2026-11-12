@@ -30,7 +30,7 @@ Not checked: whether KumoSQL's sample-database pairs (54) and unsafe-rewrite cor
 
 ## An eval for the emulator, not the prover
 
-GoogleSQL compliance tests: 4,748 claimed cases with the typed rows Google's reference implementation returns (Apache-2.0, the pinned fixture is in KumoSQL). Running them on the emulator gives a per-construct list of where it is wrong. That does not climb the prover's score. It decides which constructs the prover may trust the emulator on, which is what keeps "0 wrong" honest. First run of this is worth doing before any large corpus.
+GoogleSQL compliance tests: 4,748 claimed cases with the typed rows Google's reference implementation returns (Apache-2.0, the pinned fixture is in KumoSQL). Running them on the emulator gives a per-construct list of where it is wrong. That does not climb the prover's score. It decides which constructs the prover may trust the emulator on, which is what keeps "0 wrong" honest. It has been run: see [evals/googlesql-compliance.md](evals/googlesql-compliance.md) and [emulator-gaps.md](emulator-gaps.md).
 
 ## What the first two baselines showed
 
@@ -39,6 +39,6 @@ See [evals/pairs.md](evals/pairs.md) for the scores, the emulator gaps found and
 ## Order of work
 
 1. Raise numeric traps and documented rewrites. Done first: data seeded with each pair's own constants ([evals/pairs.md](evals/pairs.md)). Proof side done ([ported-layers.md](ported-layers.md)). Next: decide how to label float SUM order.
-2. Run the compliance fixture on the emulator and write the gap list.
+2. ~~Run the compliance fixture on the emulator and write the gap list.~~ Done: [evals/googlesql-compliance.md](evals/googlesql-compliance.md), [emulator-gaps.md](emulator-gaps.md).
 3. Pipeline equivalence and refutation on the emulator.
 4. Spider 2.0 pair generator.

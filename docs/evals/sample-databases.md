@@ -25,15 +25,15 @@ A `"real"` witness means the two queries already differ on the upstream sample d
 | Equivalent pairs left alone | 118 of 121 |
 | Equivalent pairs refuted | 0 |
 | Equivalent pairs the emulator cannot run | 3 |
-| Different pairs refuted | 132 |
-| Different pairs refuted but demoted to unknown by the trust guard | 24 |
+| Different pairs refuted | 156 (132 plus the 24 the trust guard used to demote) |
+| Different pairs refuted but demoted to unknown by the trust guard | 0 |
 | Different pairs missed | 3 |
 | Different pairs not refuted, with emulator errors on some databases | 2 |
 | Different pairs the emulator cannot run | 4 |
 
 Nothing here is proved: the run uses `--layers none`, because proofs need the declared keys, which the ported layers do not read yet. 0 wrong.
 
-**Demoted (24):** the oracle's trust guard ([../emulator-gaps.md](../emulator-gaps.md)) answers UNKNOWN for any difference involving `IN` or `NOT IN`, because the emulator gets `3 IN (1, 2, NULL)` wrong. All 24 are demoted for the same construct (`node:In`): one query of each is an `IN` or `NOT IN`, in pairs labelled different because of NULLs or duplicate keys (the `INTERSECT` and `EXCEPT` pairs among them are rewritten to `IN`). The emulator did find different rows. The NOT IN, IN, INTERSECT and join semantics those pairs rely on were checked on real BigQuery with inline values (see [unsafe-rewrites.md](unsafe-rewrites.md)); the individual 24 counterexamples were not replayed on BigQuery.
+**Formerly demoted (24):** the trust guard ([../emulator-gaps.md](../emulator-gaps.md)) used to answer UNKNOWN for any difference involving `IN` or `NOT IN`, because the emulator gets `3 IN (1, 2, NULL)` wrong. All 24 had one query with an `IN` or `NOT IN`, in pairs labelled different because of NULLs or duplicate keys (the `INTERSECT` and `EXCEPT` pairs among them are rewritten to `IN`). The guard now re-runs such a difference with the `IN` written as `OR` of `=` or as a `CASE` over `EXISTS`; all 24 still differ, so they count as refuted with the rewritten queries' rows. The NOT IN, IN, INTERSECT and join semantics those pairs rely on were checked on real BigQuery with inline values (see [unsafe-rewrites.md](unsafe-rewrites.md)); the individual 24 counterexamples were not replayed on BigQuery.
 
 **Missed (3):** `co-window-filter-on-other-column`, `pg-window-filter-on-other-column` and `pg-in-to-join-fan-out`, all `"real"` witnesses that need rows random data did not draw.
 

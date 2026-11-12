@@ -13,17 +13,17 @@
 | | Count |
 |---|---|
 | Equivalent pairs (220) left alone | 220, none refuted |
-| Different pairs (340) refuted | 240 |
-| Different pairs refuted but demoted to unknown by the trust guard | 100 |
+| Different pairs (340) refuted | 340 (316 within 16 databases, the other 24 within 64) |
+| Different pairs refuted but demoted to unknown by the trust guard | 0 (100 before the guard was narrowed on 2026-11-12) |
 | Different pairs missed | 0 |
 
-24 of the 340 were not refuted in the first 16 databases and were found within 64 (`databases_needed` in their record). 0 wrong: no equivalent pair is refuted. Nothing is proved; the run uses `--layers none`.
+The same 24 pairs needed more than 16 databases in both runs (`databases_needed` in their record). 0 wrong: no equivalent pair is refuted. Nothing is proved; the run uses `--layers none`.
 
 ## What the labels are
 
 The 220 correct variants are labelled equivalent by hand, and the run checks them: none is refuted by 16 databases, which is evidence, not a proof. The other 340 were the earlier prover's `either` ("may differ"): it refuted all of them with a DuckDB search. Here a pair is labelled not_equivalent because this oracle found a database on which the rows differ, so those 340 labels are **not independent evidence**; that half of the score measures recall of the data generator, not label quality.
 
-**Demoted (100).** The trust guard ([../emulator-gaps.md](../emulator-gaps.md)) answers UNKNOWN for any difference involving `IN`, because the emulator gets `3 IN (1, 2, NULL)` wrong. All 100 are `NOT IN` or `IN` pairs (five shapes: `not_in-exists`, `not_in-antijoin`, `not_in-notnull-filter`, `join_dupes-in`, `join_dupes-distinct-semijoin-agg`). One emulator counterexample per shape was replayed on real BigQuery with the same rows inlined, and BigQuery returned the emulator's rows: `[0,3,3]` against `[null,0,3,3]` (NOT IN against NOT EXISTS and against the anti-join), `[]` against `[100]` (NOT IN with and without the NULL filter), `[0,0]` against `[0]` (join against IN), `2` against `1` (SUM over the join against SUM over IN). The other pairs of each shape were not replayed one by one.
+**The 100 pairs that used to be demoted.** The trust guard ([../emulator-gaps.md](../emulator-gaps.md)) answered UNKNOWN for any difference involving `IN`, because the emulator gets `3 IN (1, 2, NULL)` wrong. All 100 are `NOT IN` or `IN` pairs (five shapes: `not_in-exists`, `not_in-antijoin`, `not_in-notnull-filter`, `join_dupes-in`, `join_dupes-distinct-semijoin-agg`). One emulator counterexample per shape was replayed on real BigQuery with the same rows inlined, and BigQuery returned the emulator's rows: `[0,3,3]` against `[null,0,3,3]` (NOT IN against NOT EXISTS and against the anti-join), `[]` against `[100]` (NOT IN with and without the NULL filter), `[0,0]` against `[0]` (join against IN), `2` against `1` (SUM over the join against SUM over IN). The guard now re-runs such a difference with each `IN` written as `OR` of `=` (a list) or as a `CASE` over `EXISTS` (a subquery), and reports the difference when the rewritten pair still differs; those rows are the stored counterexample. All 100 survive. The other pairs of each shape were not replayed one by one.
 
 ## Limits
 

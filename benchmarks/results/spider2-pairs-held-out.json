@@ -10,14 +10,14 @@
  "pairs_by_kind_and_oracle": {
   "mutation/agreed": 48,
   "mutation/not-run": 5,
-  "mutation/refuted": 27,
-  "mutation/untrusted": 104,
+  "mutation/refuted": 119,
+  "mutation/untrusted": 12,
   "rewrite/agreed": 127
  },
  "labels": {
   "equivalent": 127,
-  "unlabelled": 157,
-  "not_equivalent": 27
+  "not_equivalent": 119,
+  "unlabelled": 65
  },
  "rewrite_refuted": [],
  "false_proofs": [],
@@ -59,7 +59,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 39.1
+   "seconds": 50.3
   },
   {
    "case_id": "bq004",
@@ -79,7 +79,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 29.0
+   "seconds": 54.3
   },
   {
    "case_id": "bq010",
@@ -99,7 +99,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 34.1
+   "seconds": 35.2
   },
   {
    "case_id": "bq021",
@@ -119,7 +119,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 56.5
+   "seconds": 59.9
   },
   {
    "case_id": "bq039",
@@ -139,7 +139,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 55.1
+   "seconds": 101.3
   },
   {
    "case_id": "bq074",
@@ -203,7 +203,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 36.4
+   "seconds": 39.2
   },
   {
    "case_id": "bq112",
@@ -223,7 +223,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 68.5
+   "seconds": 81.0
   },
   {
    "case_id": "bq114",
@@ -243,7 +243,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 41.8
+   "seconds": 44.7
   },
   {
    "case_id": "bq126",
@@ -263,14 +263,14 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 45.2
+   "seconds": 46.4
   },
   {
    "case_id": "bq143",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 3,
-   "databases_nonempty_filtered": 3,
+   "databases_nonempty": 2,
+   "databases_nonempty_filtered": 2,
    "databases_failed": 0,
    "base_error": "",
    "builder": {
@@ -283,7 +283,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 68.9
+   "seconds": 72.8
   },
   {
    "case_id": "bq161",
@@ -314,7 +314,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 37.3
+   "seconds": 39.1
   },
   {
    "case_id": "bq232",
@@ -334,7 +334,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 38.0
+   "seconds": 39.1
   },
   {
    "case_id": "bq281",
@@ -354,7 +354,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 32.3
+   "seconds": 60.0
   },
   {
    "case_id": "bq285",
@@ -385,7 +385,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 38.8
+   "seconds": 40.7
   },
   {
    "case_id": "bq327",
@@ -405,7 +405,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 52.1
+   "seconds": 54.8
   },
   {
    "case_id": "bq338",
@@ -425,7 +425,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 60.7
+   "seconds": 62.5
   },
   {
    "case_id": "bq355",
@@ -456,7 +456,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 41.2
+   "seconds": 69.5
   },
   {
    "case_id": "bq396",
@@ -476,7 +476,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 63.7
+   "seconds": 94.9
   },
   {
    "case_id": "bq424",
@@ -496,7 +496,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 43.7
+   "seconds": 45.3
   },
   {
    "case_id": "ga001",
@@ -516,7 +516,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 38.6
+   "seconds": 92.0
   },
   {
    "case_id": "ga008",
@@ -536,7 +536,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 31.9
+   "seconds": 54.2
   },
   {
    "case_id": "ga012",
@@ -556,7 +556,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 14.6
+   "seconds": 15.0
   },
   {
    "case_id": "ga017",
@@ -576,7 +576,7 @@
     "count_thresholds": 0,
     "scenarios": 3
    },
-   "seconds": 44.4
+   "seconds": 77.2
   }
  ]
 }

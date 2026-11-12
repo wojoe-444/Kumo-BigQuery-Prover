@@ -17,7 +17,7 @@
 | Equivalent proved | 28 of 39 (1 identical, 3 structural, 24 algebraic) |
 | Equivalent not proved | 11 (5 withheld, see below) |
 | Equivalent refuted | 0 |
-| Different refuted | 20 of 24 (3 more differ on the emulator but are demoted to unknown by the [trust guard](../emulator-gaps.md); 23 of 24 without it) |
+| Different refuted | 23 of 24 (3 of these were demoted to unknown by the [trust guard](../emulator-gaps.md) until it was narrowed on 2026-11-12; the set was run once more afterwards and not tuned on) |
 | False proofs | 0 |
 
 Results file: `benchmarks/results/pairs-heldout-2026-11-12.json`.

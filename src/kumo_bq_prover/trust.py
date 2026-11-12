@@ -13,6 +13,15 @@ BigQuery if the emulator computes both answers the way BigQuery does. The Google
 
 A refutation that fails either check is reported as UNKNOWN with the reason, never as REFUTED. This only
 ever costs refutations: it cannot turn an unknown into a proof.
+
+Two refinements keep the guard from withholding differences the emulator got right:
+
+* **Conditional constructs.** An entry of ``untrusted_constructs.json`` with a ``when`` field is untrusted only when
+  the witness holds that kind of value: ``like:plain`` (LIKE with a literal pattern) only with a newline in the data,
+  ``fn:SUBSTRING`` and string-position functions only with non-ASCII text (the emulator counts bytes there).
+* **Exact rewrites** (:func:`adjudicate`). A difference that involves only ``IN``, ``BETWEEN`` or ``IS TRUE`` is
+  checked again on queries written without them (``gap_rewrites.py``). If the difference survives, it is a
+  counterexample for BigQuery whatever the emulator does with ``IN``; if not, the emulator's gap produced it.
 """
 
 from __future__ import annotations
@@ -23,9 +32,11 @@ import math
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Iterable
+from dataclasses import dataclass, field
+from typing import Any, Callable, Iterable
 
 from .constructs import UNPARSED, constructs
+from .gap_rewrites import REWRITABLE, rewrite
 
 DATA = Path(__file__).with_name("untrusted_constructs.json")
 LARGE = 1e18  # float and NUMERIC magnitudes from here on are not trusted (the compliance cases with such values fail four times as often; none sit between 1e15 and 1e18)
@@ -46,12 +57,62 @@ def untrusted_constructs() -> dict[str, dict]:
     return json.loads(DATA.read_text())["untrusted"]
 
 
-def construct_hits(*queries: str) -> list[str]:
-    """The untrusted constructs the queries use, sorted. A query that does not parse is a hit of its own."""
+def witness_facts(texts: Iterable[str] = (), rows: Iterable[Iterable[tuple]] = ()) -> set[str]:
+    """The kinds of value the witness holds that make a conditional construct untrusted (``non-ascii``, ``newline``)."""
+    facts: set[str] = set()
+    strings = list(texts)
+
+    def visit(cell: Any) -> None:
+        if isinstance(cell, str):
+            strings.append(cell)
+        elif isinstance(cell, tuple) and cell and cell[0] in ("ARRAY", "STRUCT"):
+            for item in cell[1]:
+                visit(item[1] if cell[0] == "STRUCT" else item)
+
+    for result in rows:
+        for row in result:
+            for cell in row:
+                visit(cell)
+    for text in strings:
+        if any(ord(ch) > 127 for ch in text) or re.search(r"\\[ux][0-9a-fA-F]", text):
+            facts.add("non-ascii")
+        if "\n" in text or "\\n" in text or "\r" in text:
+            facts.add("newline")
+    return facts
+
+
+CAST_TAGS = frozenset({"cast:INT64", "safe_cast:INT64"})
+
+
+def _whole_numbers_beyond(texts: Iterable[str], rows: Iterable[Iterable[tuple]], limit: int) -> bool:
+    for text in texts:
+        for match in _NUMBER.finditer(text):
+            token = match.group(0)
+            if not re.search(r"[.eE]", token) and abs(int(token)) >= limit:
+                return True
+    stack: list[Any] = [cell for result in rows for row in result for cell in row]
+    while stack:
+        cell = stack.pop()
+        if isinstance(cell, bool):
+            continue
+        if isinstance(cell, int) and abs(cell) >= limit:
+            return True
+        if isinstance(cell, tuple) and cell and cell[0] in ("ARRAY", "STRUCT"):
+            stack.extend(item[1] if cell[0] == "STRUCT" else item for item in cell[1])
+    return False
+
+
+def construct_hits(*queries: str, facts: set[str] | None = None) -> list[str]:
+    """The untrusted constructs the queries use, sorted. A query that does not parse is a hit of its own.
+
+    A conditional construct (``when`` in the file) counts only when its condition is among ``facts``; with ``facts=None``
+    every conditional construct counts (the cautious reading, for callers that have no witness).
+    """
     untrusted = untrusted_constructs()
     hits: set[str] = set()
     for sql in queries:
-        hits |= constructs(sql) & (untrusted.keys() | {UNPARSED})
+        found = constructs(sql) & (untrusted.keys() | {UNPARSED})
+        hits |= {tag for tag in found if facts is None or tag == UNPARSED or untrusted[tag].get("when") in (None, *facts)}
     return sorted(hits)
 
 
@@ -123,4 +184,63 @@ def untrusted_reasons(
     right_rows: Iterable[tuple] = (),
 ) -> list[str]:
     """Why a refutation on this pair and data cannot be trusted (empty when it can)."""
-    return construct_hits(left_sql, right_sql) + value_hits(setup, [left_sql, right_sql], [left_rows, right_rows])
+    setup = list(setup)
+    left_rows, right_rows = list(left_rows), list(right_rows)
+    facts = witness_facts(setup + [left_sql, right_sql], [left_rows, right_rows])
+    return construct_hits(left_sql, right_sql, facts=facts) + value_hits(setup, [left_sql, right_sql], [left_rows, right_rows])
+
+
+@dataclass
+class Adjudication:
+    """What to say about a difference the emulator found: report it (``trusted``) or withhold it, and with which rows."""
+
+    trusted: bool
+    reasons: list[str] = field(default_factory=list)
+    left_rows: list[tuple] = field(default_factory=list)
+    right_rows: list[tuple] = field(default_factory=list)
+    #: True when the rows come from the rewritten queries (the emulator's own rows for the originals were wrong or unchecked).
+    rewritten: bool = False
+
+
+def adjudicate(
+    run: Callable[[str], list[tuple]],
+    left_sql: str,
+    right_sql: str,
+    setup: Iterable[str] = (),
+    left_rows: Iterable[tuple] = (),
+    right_rows: Iterable[tuple] = (),
+) -> Adjudication:
+    """Decide whether a difference on ``setup`` is a counterexample for BigQuery.
+
+    ``run(sql)`` executes one query on the data of the witness and returns its rows (it may raise ``QueryError``).
+    When the only untrusted constructs are ``IN``, ``BETWEEN`` and ``IS TRUE`` (:data:`REWRITABLE`), both queries are
+    rewritten without them (``gap_rewrites.rewrite``) and run again: the difference counts if the rewritten pair still
+    differs and the rewritten pair passes the ordinary checks. The returned rows are then the rewritten queries' rows.
+    """
+    from .emulator import QueryError
+
+    setup, left_rows, right_rows = list(setup), list(left_rows), list(right_rows)
+    reasons = untrusted_reasons(left_sql, right_sql, setup, left_rows, right_rows)
+    if not reasons:
+        return Adjudication(True, [], left_rows, right_rows)
+    if not set(reasons) <= REWRITABLE:
+        return Adjudication(False, reasons, left_rows, right_rows)
+    if reasons and set(reasons) & CAST_TAGS and _whole_numbers_beyond(setup + [left_sql, right_sql], [left_rows, right_rows], 2**53):
+        # ROUND turns an INT64 into a FLOAT64, which cannot hold integers from 2^53 exactly.
+        return Adjudication(False, reasons + ["value:int-above-2^53"], left_rows, right_rows)
+    new_left, new_right = rewrite(left_sql), rewrite(right_sql)
+    if new_left is None or new_right is None:
+        return Adjudication(False, reasons, left_rows, right_rows)
+    try:
+        rewritten_left, rewritten_right = run(new_left), run(new_right)
+    except QueryError:
+        return Adjudication(False, reasons, left_rows, right_rows)
+    from .values import same_rows
+
+    if same_rows(rewritten_left, rewritten_right):
+        # The rewritten pair agrees: the difference came from the emulator's IN, BETWEEN or IS TRUE.
+        return Adjudication(False, [f"{reason}: the difference disappears when written without it" for reason in reasons], rewritten_left, rewritten_right, True)
+    again = untrusted_reasons(new_left, new_right, setup, rewritten_left, rewritten_right)
+    if again:
+        return Adjudication(False, again, rewritten_left, rewritten_right, True)
+    return Adjudication(True, [], rewritten_left, rewritten_right, True)

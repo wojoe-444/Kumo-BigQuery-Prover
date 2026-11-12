@@ -1,0 +1,18 @@
+{
+ "note": "Real BigQuery (project kumosql, inline constants, 0 bytes billed, 2026-11-12): the original IN, BETWEEN and IS TRUE expressions over 32 rows; the rewritten forms gave the same strings.",
+ "rows": {
+  "in_unnest": "falseNNNNNNNfalseNtruefalsetrueNtruetruefalseNfalsetrueNtruetruetruefalseNfalsefalseNNfalseN",
+  "notin_unnest": "trueNNNNNNNtrueNfalsetruefalseNfalsefalsetrueNtruefalseNfalsefalsefalsetrueNtruetrueNNtrueN",
+  "in_sub": "falseNNNNNNNfalseNtruefalsetrueNtruetruefalseNfalsetrueNtruetruetruefalseNfalsefalseNNfalseN",
+  "notin_sub": "trueNNNNNNNtrueNfalsetruefalseNfalsefalsetrueNtruefalseNfalsefalsefalsetrueNtruetrueNNtrueN",
+  "in_list": "NNNNNNNNfalseNtruefalsetrueNtruetruefalseNfalsetrueNtruetruetruefalseNfalsefalseNNfalseN",
+  "notin_list": "NNNNNNNNtrueNfalsetruefalseNfalsefalsetrueNtruefalseNfalsefalseNtrueNtruetrueNNtrueN",
+  "between": "NNNNNNNNfalseNtruefalseNNtrueNfalseNtruetruefalseNtruefalsefalseNtruetruefalsefalsefalsefalse",
+  "notbetween": "NNNNNNNNtrueNfalsetrueNNfalseNtrueNfalsefalsetrueNfalsetruetrueNfalsefalsetruetruetruetrue",
+  "istrue": "falsefalsefalsefalsefalsefalsefalsefalsefalsefalsefalsefalsefalsefalsefalsefalsefalsefalsetruefalsefalsefalsetruefalsefalsefalsetruetruefalsefalsetruefalse",
+  "isnottrue": "truetruetruetruetruetruetruetruetruetruetruetruetruetruetruetruetruetruefalsetruetruetruefalsetruetruetruefalsefalsetruetruefalsetrue",
+  "isfalse": "falsefalsefalsefalsefalsefalsefalsefalsetruefalsetruetruefalsefalsetruefalsetruefalsefalsetruefalsefalsefalsefalsetruefalsefalsefalsefalsefalsefalsefalse",
+  "isnotfalse": "truetruetruetruetruetruetruetruefalsetruefalsefalsetruetruefalsetruefalsetruetruefalsetruetruetruetruefalsetruetruetruetruetruetruetrue",
+  "sub_in_where_corr": "falsefalsefalsefalsefalsefalsefalsefalsefalsefalsetruefalsetruefalsetruetruefalsefalsefalsetruefalsetruetruetruefalsefalsefalsefalsefalsefalsefalsefalse"
+ }
+}

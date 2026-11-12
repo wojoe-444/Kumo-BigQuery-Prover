@@ -50,17 +50,21 @@ The untrusted construct list is built from the development files only. On the he
 | Development files (the list was built on them) | 149 of 185 | 430 of 1,680 |
 | Held-out files, list as built from development | 37 of 60 | 111 of 550 |
 | Held-out files, after adding `BETWEEN` (tuned on test) | 39 of 60 | 124 of 550 |
+| Development files, finer tags and conditional constructs (2026-11-12) | 150 of 185 | 419 of 1,680 |
+| Held-out files, finer tags and conditional constructs (tuned on test for `EXTRACT`, `LIKE`, `SUBSTR`) | 41 of 60 | 124 of 550 |
+
+The last two rows count the guard's static part only: a case that uses `IN`, `BETWEEN`, `IS TRUE` or `CAST` to INT64 is still flagged here, although `trust.adjudicate` may let a pair through after the exact rewrite check ([emulator-gaps.md](../emulator-gaps.md#what-the-guard-does)). They show that splitting `EXTRACT`, `LIKE`, `SUBSTR` and `FORMAT` by the part that is wrong did not lose failing cases: 150 and 41 flagged against 149 and 39 before. `CURRENT_*`, `GENERATE_UUID` and `AT TIME ZONE` are untrusted now (two held-out cases that `EXTRACT` used to catch by accident).
 
 A case is flagged when it uses an untrusted construct or its SQL or the tables it reads hold a value the value check refuses (see [emulator-gaps.md](../emulator-gaps.md#what-the-guard-does)). Compliance cases are built to probe edges, so the share of passing cases flagged here overstates what ordinary queries lose; on the two pair corpora see [pairs.md](pairs.md#the-guard).
 
 ## Splits and exposure
 
-The harness rules were fixed on development files: time zone cases set aside, a NULL array equal to an empty one, signed zero not scored, narrow GoogleSQL number types unscored, tables checked against their printed rows without row order. The held-out files were run after that and the first figures were 550 pass, 52 wrong, 9 missing_error, 1 zone. One later change, setting aside cases whose only difference is a TIMESTAMP off by a time zone offset (a multiple of 15 minutes, at most 14 hours), was designed on development cases and applied to both splits; it moved 4 development cases and 1 held-out case from wrong to zone, which is why the table says 51 wrong and 2 zone. The `BETWEEN` entry was added after reading the held-out failures, so the last row above is tuned on test. The untrusted list in the repository is the development-derived one plus eleven curated entries, `BETWEEN` among them (see `CURATED` in `tools/compliance_gaps.py`).
+The harness rules were fixed on development files: time zone cases set aside, a NULL array equal to an empty one, signed zero not scored, narrow GoogleSQL number types unscored, tables checked against their printed rows without row order. The held-out files were run after that and the first figures were 550 pass, 52 wrong, 9 missing_error, 1 zone. One later change, setting aside cases whose only difference is a TIMESTAMP off by a time zone offset (a multiple of 15 minutes, at most 14 hours), was designed on development cases and applied to both splits; it moved 4 development cases and 1 held-out case from wrong to zone, which is why the table says 51 wrong and 2 zone. The `BETWEEN` entry was added after reading the held-out failures, so the last row above is tuned on test. The untrusted list in the repository is the development-derived one plus the curated entries (`CURATED` and `CONDITIONAL` in `tools/compliance_gaps.py`): `BETWEEN`, and since 2026-11-12 the parts found wrong on BigQuery (`EXTRACT(WEEK)`, `LIKE` with `_`, `DATE_DIFF` in ISO weeks, unverified `FORMAT_DATE` directives), volatile functions and time zones. The held-out failures of `EXTRACT`, `LIKE` and `SUBSTR` were read while doing that, so those tags are tuned on test.
 
 ## Limits
 
 - The reference is Google's evaluator, not BigQuery. They can differ, and only the classes in the table of confirmed queries were checked on BigQuery.
 - Cases that touch NaN or infinity data are unmeasured (the emulator cannot build the tables), and those are the values most likely to expose a gap.
 - The blame is per construct, not per cause. A construct such as `cast_lit:NUMERIC` is untrusted because many of its cases fail, but the failing cases come from specific values (high precision, range limits) that the value check also catches.
-- The guard misses 21 of 60 failing held-out cases (and 36 of 185 development ones), and constructs the cases never use have no evidence.
+- The guard misses 19 of 60 failing held-out cases (and 35 of 185 development ones), and constructs the cases never use have no evidence.
 - The emulator was restarted per file group and the runner never touches real BigQuery.

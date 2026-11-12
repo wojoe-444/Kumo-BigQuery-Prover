@@ -2,12 +2,12 @@
   "eval": "pairs-unsafe-rewrites",
   "status": "measured",
   "size": 560,
-  "score": "equivalent: 220 of 220 left alone, 0 refuted; not equivalent: 240 refuted, 100 refuted but demoted by the trust guard, 0 missed",
+  "score": "equivalent: 220 of 220 left alone, 0 refuted; not equivalent: 340 refuted (316 within 16 databases, 24 more within 64), 0 demoted by the trust guard, 0 missed",
   "proved": 0,
   "wrong": 0,
   "date": "2026-11-12",
   "emulator": "goccy/bigquery-emulator v0.8.1",
-  "command": "python tools/run_pairs_eval.py unsafe-rewrites --databases 16 --layers none (24 pairs needed --databases 64)",
-  "baseline": "none before this run: the corpus has 340 pairs the earlier prover called 'either', so this run set their labels",
-  "caveats": "Two INT64 tables, BigQuery dialect, rewrites that look valid and are not (NOT IN with NULLs, COUNT(*) against COUNT(col), duplicate-producing joins, UNION against INTERSECT, predicates moved across outer joins), each next to a correct variant. The 220 equivalent labels come from hand-written correct variants and are checked here: none is refuted. The 340 different labels are not independent evidence: the earlier prover's 'either' became not_equivalent only because this oracle found a database, so that half measures recall of the data generator, not label quality. 100 of those are demoted by the trust guard (all node:In: NOT IN, IN and semi-join shapes); the five shapes were replayed with the emulator's counterexamples on real BigQuery and gave the same rows. 24 pairs needed more than 16 databases (found within 64). 140 pairs are held out in KumoSQL; this corpus has no held-out split of its own, and the data generator's NULL settings were adjusted after reading misses (tuned on test). Nothing is proved (--layers none)."
+  "command": "python tools/run_pairs_eval.py unsafe-rewrites --databases 16 --layers none (24 pairs needed --databases 64, rerun with --ids)",
+  "baseline": "before the trust guard was narrowed (2026-11-12 earlier run): 240 refuted, 100 refuted but demoted by the guard, 0 missed",
+  "caveats": "Two INT64 tables, BigQuery dialect, rewrites that look valid and are not (NOT IN with NULLs, COUNT(*) against COUNT(col), duplicate-producing joins, UNION against INTERSECT, predicates moved across outer joins), each next to a correct variant. The 220 equivalent labels come from hand-written correct variants and are checked here: none is refuted. The 340 different labels are not independent evidence: the earlier prover's 'either' became not_equivalent only because this oracle found a database, so that half measures recall of the data generator, not label quality. The 100 pairs the guard used to demote (all node:In: NOT IN, IN and semi-join shapes) are now refuted: the guard re-runs a difference that involves IN with the IN written as plain `=`, `OR` and `CASE`/`EXISTS`, and the difference survives. The five shapes were replayed with the emulator's counterexamples on real BigQuery and gave the same rows; the other pairs of each shape were not replayed one by one. 24 pairs needed more than 16 databases (found within 64, the same 24 as before). 140 pairs are held out in KumoSQL; this corpus has no held-out split of its own, and the data generator's NULL settings were adjusted after reading misses (tuned on test). Nothing is proved (--layers none)."
 }

@@ -114,12 +114,56 @@ def _variants(column_kind: str, const) -> list:
     return []
 
 
+def _exact(column_kind: str, const) -> list:
+    """Just the constant itself, as a value of the column's type (no neighbours)."""
+    kind, value = const
+    if column_kind == "INT64" and kind in ("int", "float"):
+        return [int(value // 1)]
+    if column_kind == "FLOAT64" and kind in ("int", "float"):
+        return [float(value)]
+    if column_kind in ("NUMERIC", "BIGNUMERIC") and kind in ("int", "float"):
+        number = decimal.Decimal(str(value))
+        return [str(number)] if -number.as_tuple().exponent <= 9 else []
+    if column_kind == "STRING":
+        if kind == "str":
+            return [value.replace("%", "").replace("_", "") or value, value]
+        if kind in ("int", "float"):
+            return [str(int(value)) if kind == "int" else str(value)]
+    if column_kind in ("DATE", "DATETIME", "TIMESTAMP"):
+        variants = _variants(column_kind, const)
+        return [v for v in variants if isinstance(v, str)][len(variants) // 2 : len(variants) // 2 + 1]
+    return []
+
+
+def _midpoint(column_kind: str, low, high) -> list:
+    """A value between two constants of a BETWEEN, so a range filter can match something."""
+    (lk, lv), (hk, hv) = low, high
+    try:
+        if column_kind in ("INT64", "FLOAT64") and lk in ("int", "float") and hk in ("int", "float"):
+            mid = (lv + hv) / 2
+            return [int(mid) if column_kind == "INT64" else float(mid)]
+        if lk == "str" and hk == "str" and lv.isdigit() and hv.isdigit() and len(lv) == len(hv) and column_kind == "STRING":
+            return [str((int(lv) + int(hv)) // 2).zfill(len(lv))]
+        if column_kind in ("DATE", "STRING") and lk in ("str", "date") and hk in ("str", "date"):
+            a = lv if lk == "date" else datetime.date.fromisoformat(lv[:10])
+            b = hv if hk == "date" else datetime.date.fromisoformat(hv[:10])
+            mid = a + (b - a) / 2
+            return [str(mid)] if column_kind == "DATE" else [str(mid), str(mid).replace("-", "")]
+    except (ValueError, TypeError):
+        return []
+    return []
+
+
 def _column_names(node: exp.Expression) -> set[str]:
     return {c.name for c in node.find_all(exp.Column)}
 
 
-def harvest(left_sql: str, right_sql: str, schema: dict[str, dict[str, str]]) -> dict[str, list]:
-    """Per column name, values worth putting in test data. Never raises on unparsable SQL."""
+def harvest(left_sql: str, right_sql: str, schema: dict[str, dict[str, str]], exact: bool = False) -> dict[str, list]:
+    """Per column name, values worth putting in test data. Never raises on unparsable SQL.
+
+    With ``exact`` the values are only the constants themselves (and, for a BETWEEN, a value
+    inside its range): the ones a query's filters need so that it returns rows at all.
+    """
     kinds: dict[str, set[str]] = {}
     for columns in schema.values():
         for name, declared in columns.items():
@@ -128,7 +172,7 @@ def harvest(left_sql: str, right_sql: str, schema: dict[str, dict[str, str]]) ->
 
     def add(column: str, const) -> None:
         for kind in kinds.get(column, ()):
-            for value in _variants(kind, const):
+            for value in (_exact(kind, const) if exact else _variants(kind, const)):
                 bucket = found.setdefault(column, [])
                 if value not in bucket:
                     bucket.append(value)
@@ -150,6 +194,18 @@ def harvest(left_sql: str, right_sql: str, schema: dict[str, dict[str, str]]) ->
             else:
                 continue
             consts = [c for c in (_const(s) for s in sides if s is not None) if c]
+            if exact and isinstance(node, exp.Between) and len(consts) == 2:
+                owners_mid = set()
+                for side in sides[:1]:
+                    if side is not None and _const(side) is None:
+                        owners_mid |= _column_names(side)
+                if len(owners_mid) == 1:
+                    (owner_mid,) = owners_mid
+                    for kind in kinds.get(owner_mid, ()):
+                        for value in _midpoint(kind, consts[0], consts[1]):
+                            bucket = found.setdefault(owner_mid, [])
+                            if value not in bucket:
+                                bucket.append(value)
             owners: set[str] = set()
             for side in sides:
                 if side is not None and _const(side) is None:

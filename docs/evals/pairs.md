@@ -61,6 +61,8 @@ Emulator problems:
 - Integer literals past the INT64 range, like -9223372036854775809, are refused at analysis (as BigQuery does); a pool value must stay inside the range.
 - Unary minus (`-x`) is missing.
 - `LEFT JOIN UNNEST(arr)` without `ON` drops rows with an empty array (found in the first run, see [bq-shapes.md](bq-shapes.md)).
+- **Wrong result:** `x IS NOT TRUE` returns NULL instead of TRUE when `x` is NULL, so a filter on it drops the row (found by the [proof audit](proof-audit.md)).
+- **Wrong result:** a `UNION ALL` branch picks up the columns of an earlier branch that repeated an expression: `SELECT a, a AS b FROM u UNION ALL SELECT a, b FROM u` returns `(1, 1)` twice where BigQuery returns `(1, 1)` and `(1, 2)` (found by the proof audit).
 
 Corpus problems (the emulator agrees with BigQuery, the labels do not):
 - `R012b-09` uses `qty = NULL`, which BigQuery refuses to compile. The case is not valid BigQuery.

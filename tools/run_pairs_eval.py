@@ -173,10 +173,13 @@ def main() -> int:
     parser.add_argument("--only", help="run only case ids containing this text")
     parser.add_argument("--ids", help="a file with one case id per line: run only those cases")
     parser.add_argument("--shard", help="i/n: run every n-th case starting at i, so n runs can share one corpus")
+    parser.add_argument("--split", choices=("all", "dev", "held-out"), default="all", help="held-out is every fourth case of the file, from the fourth (index %% 4 == 3, the convention of KumoSQL's numeric-traps bench); dev is the rest")
     parser.add_argument("--layers", default=",".join(LAYERS), help="comma-separated static layers to use (identical,structural,algebraic,smt); 'none' for the oracle alone")
     args = parser.parse_args()
     layers = tuple(x for x in args.layers.split(",") if x and x != "none")
     cases = [json.loads(line) for line in (ROOT / "benchmarks/pairs" / f"{args.corpus}.jsonl").read_text().splitlines() if line]
+    if args.split != "all":
+        cases = [c for i, c in enumerate(cases) if (i % 4 == 3) == (args.split == "held-out")]
     if args.only:
         cases = [c for c in cases if args.only in c["id"]]
     if args.ids:

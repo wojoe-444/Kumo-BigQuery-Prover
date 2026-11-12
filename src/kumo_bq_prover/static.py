@@ -53,19 +53,30 @@ class StaticResult:
     withheld: str = ""
 
 
-def solver_inputs(schema: dict[str, dict[str, str]] | None) -> dict:
-    """``schema={table: [columns]}`` and ``types={table: {column: BigQuery type}}`` for the layers."""
+def solver_inputs(schema: dict[str, dict[str, str] | list[str]] | None) -> dict:
+    """``schema={table: [columns]}`` and ``types={table: {column: BigQuery type}}`` for the layers.
+
+    A table given as a list of column names has no types; the layers then read its columns as untyped.
+    """
 
     if not schema:
         return {}
-    lowered = {table.lower(): {column.lower(): normalize_type(kind) for column, kind in columns.items()} for table, columns in schema.items()}
-    return {"schema": {table: list(columns) for table, columns in lowered.items()}, "types": lowered}
+    columns_of = {table.lower(): (list(columns) if not isinstance(columns, dict) else list(columns)) for table, columns in schema.items()}
+    options: dict = {"schema": {table: [column.lower() for column in columns] for table, columns in columns_of.items()}}
+    typed = {
+        table.lower(): {column.lower(): normalize_type(kind) for column, kind in columns.items()}
+        for table, columns in schema.items()
+        if isinstance(columns, dict)
+    }
+    if typed:
+        options["types"] = typed
+    return options
 
 
 def prove_static_detailed(
     left_sql: str,
     right_sql: str,
-    schema: dict[str, dict[str, str]] | None = None,
+    schema: dict[str, dict[str, str] | list[str]] | None = None,
     layers: tuple[str, ...] = LAYERS,
     ordered: bool = False,
 ) -> StaticResult:
@@ -81,7 +92,12 @@ def prove_static_detailed(
     except sqlglot.errors.SqlglotError as error:
         return StaticResult(Verdict.UNKNOWN, "identical", f"parse error: {error}")
     if "identical" in layers and left == right:
-        return StaticResult(Verdict.PROVEN, "identical", "identical after parsing")
+        # Identical text is not enough when the query can answer differently on two runs (APPROX_*, a LIMIT with no total
+        # order, a window with ties): the structural layer holds that line, so it must agree. It tolerates a volatile
+        # call that both sides leave in place.
+        vetted = _run_layer("structural", left_sql, right_sql, {})
+        if vetted is not None and vetted[0]:
+            return StaticResult(Verdict.PROVEN, "identical", "identical after parsing")
     if ordered:
         return StaticResult(Verdict.UNKNOWN, "identical", "ordered comparison: only identical queries are proven")
     options = solver_inputs(schema)

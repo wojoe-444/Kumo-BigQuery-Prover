@@ -56,7 +56,7 @@ The others are disclosures: result column types are not compared (confirm schema
 
 - **Ported tests** (`tests/ported/`): 139 files, 3,098 test cases, all passing with no extra engine installed. They are the upstream tests with the ones that replay a witness database on another engine removed, because that is what they were for; 97 upstream files had no test left or read files from the upstream repository. The removed witness tests are replaced by the proof audit below, which reaches the same pairs through the prover call and checks them on the emulator.
 - **Proof audit:** [evals/proof-audit.md](evals/proof-audit.md): every pair the upstream tests give their provers (1,186), proved by the port and run on the emulator. 411 proved, 0 unexplained refutations; it found one false proof (identical text, nondeterministic query) and two emulator bugs.
-- **Held-out set:** [evals/heldout.md](evals/heldout.md): 63 pairs frozen before the layers ran on them. 28 of 39 equivalent proved, 23 of 24 different refuted, 0 false proofs.
+- **Held-out set:** [evals/heldout.md](evals/heldout.md): 63 pairs frozen before the layers ran on them. 28 of 39 equivalent proved, 20 of 24 different refuted (23 of 24 without the trust guard), 0 false proofs.
 - **False-proof detector:** `tools/run_pairs_eval.py` runs every pair the layers prove on the seeded databases of the emulator. A proved pair the emulator refutes is `PROOF_REFUTED`, a proved pair labelled different is `FALSE_PROOF`, and the script exits 1 on either. See [evals/pairs.md](evals/pairs.md) for the scores.
 - **What the detector cannot see:** a pair whose difference needs data the generator rarely draws. The FLOAT64 regrouping false proof was not found by 8 random databases; the label found it.
 

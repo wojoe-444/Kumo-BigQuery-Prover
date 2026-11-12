@@ -95,7 +95,7 @@ def work(chunk: list[dict], databases: int) -> list[dict]:
                 for seed in range(databases):
                     if not schema:
                         break
-                    result = compare(client, pair["left"], pair["right"], setup=random_database(schema, seed, extra=extra))
+                    result = compare(client, pair["left"], pair["right"], setup=random_database(schema, seed, extra=extra), trust=False)
                     if result.verdict is Verdict.REFUTED:
                         refuted = {"setup": result.setup, "left": result.left_rows[:5], "right": result.right_rows[:5]}
                         break

@@ -2,11 +2,13 @@
   "eval": "pairs-numeric-traps",
   "status": "measured",
   "size": 112,
-  "score": "equivalent: 61 of 65 not refuted, 1 refuted (emulator bug), 3 emulator errors; not equivalent: 11 of 26 refuted, 14 missed, 1 emulator error; 21 error-class cases unscored",
+  "score": "equivalent: 61 of 65 not refuted, 1 refuted (emulator bug), 3 emulator errors; not equivalent: 12 of 26 refuted, 13 missed, 1 emulator error; 21 error-class cases unscored",
   "proved": 0,
   "wrong": 1,
-  "date": "2026-11-11",
+  "date": "2026-11-12",
   "emulator": "goccy/bigquery-emulator v0.8.1",
   "command": "python tools/run_pairs_eval.py numeric-traps --databases 8",
-  "caveats": "The 1 wrong is the emulator, not the prover: it returns 2 for CAST(2.5 AS INT64) where real BigQuery returns 3 (checked on real BigQuery). Two label problems found against real BigQuery: NUMERIC literals with ten decimals are rejected, so numeric-literal-rounding and numeric-literal-below-half are not valid BigQuery. Refutation only; 8 seeded random databases plus the case's witness rows when it has one."
+  "baseline": "without literal harvesting (--no-harvest): 11 of 26 refuted, 14 missed, 1 wrong (2026-11-11)",
+  "with_specials": "with --specials (tuned on test): 13 of 26 refuted, 12 missed, 2 wrong. The extra wrong is a label question: SUM over FLOAT64 depends on addition order, and the pair float-sum-union-branches-swapped is labelled equivalent",
+  "caveats": "The 1 wrong is the emulator, not the prover: CAST(FLOAT64 AS INT64) truncates where real BigQuery rounds half away from zero (2.5 gives 2, BigQuery 3). Refutation only; 8 seeded random databases plus the case's witness rows when it has one. Two label problems found against real BigQuery: ten-decimal NUMERIC literals are rejected (numeric-literal-rounding, numeric-literal-below-half). Development set, no held-out split."
 }

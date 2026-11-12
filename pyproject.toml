@@ -32,4 +32,4 @@ markers = [
     "emulator: needs the BigQuery emulator binary (run with: pytest -m emulator; fails, never skips, when the binary is missing)",
     "eval: scores the prover on a benchmark corpus",
 ]
-addopts = "-m 'not emulator and not eval'"
+addopts = "-m 'not emulator and not eval' -n auto"

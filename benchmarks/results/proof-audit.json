@@ -1,0 +1,27 @@
+{
+  "eval": "proof-audit-upstream-test-pairs",
+  "status": "measured",
+  "size": 1186,
+  "score": "411 pairs proved: 325 checked on the emulator with no refutation, 2 refuted by emulator bugs (real BigQuery agrees), 1 refuted under the disclosed SUM-order assumption, 63 not runnable on the emulator, 21 with a volatile call left identical; 774 not proved; 0 unexplained refutations",
+  "proved": 411,
+  "wrong": 0,
+  "false_proofs": 0,
+  "counts": {
+    "not_proved": 774,
+    "proved_volatile": 21,
+    "proved_checked": 325,
+    "proved_unchecked": 63,
+    "emulator_bug": 2,
+    "ASSUMPTION_REFUTED": 1
+  },
+  "proof_layers": {
+    "identical": 56,
+    "structural": 47,
+    "algebraic": 287,
+    "smt": 19
+  },
+  "date": "2026-11-12",
+  "emulator": "goccy/bigquery-emulator v0.8.1",
+  "command": "python tools/audit_proofs.py benchmarks/audit/upstream-test-pairs.jsonl --databases 8 --workers 4",
+  "caveats": "No labels: the pairs are every pair that Kumo_SQL_Prover's own tests handed to its provers (recorded with tools/record_prover_calls.py from the upstream suite at ff364a7, including tests that were not ported, which reach the prover before they fail at their engine call). Pairs that passed constraints (keys, NOT NULL, foreign keys) are left out. The earlier prover's rules were written against many of these pairs (tuned on test). Data for pairs without a declared schema, and for undeclared columns, comes from a guess (src/kumo_bq_prover/infer.py); 63 proved pairs could not be run because the emulator rejected a statement. A refutation needs data the 8 seeded databases draw: the audit found one false proof (identical text with APPROX_TOP_COUNT proved equal; two runs of it differ) and, in its first runs, three refutations that were artifacts of its own data generation (a guessed column added to a declared table, a wrong column order), which were fixed in the audit. Absence of a refutation is not a proof."
+}

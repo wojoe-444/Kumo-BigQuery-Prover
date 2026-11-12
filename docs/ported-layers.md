@@ -39,7 +39,7 @@ Changed from upstream, and not yet reported there:
 
 ## How `static.py` decides `PROVEN`
 
-1. **Bag semantics only.** With `ordered=True` only an identical parse is proved.
+1. **Bag semantics only.** With `ordered=True` only an identical parse is proved. An identical parse is proved only when the structural layer agrees, because identical text is not enough for a query that can answer differently on two runs (`APPROX_*`, a window with ties); found by the proof audit.
 2. **Runtime errors.** The SMT layer reports what a rewrite does to errors (`none`, `same`, `refines`, `introduces`, `unknown`). A proof is kept only for `none` or `same`. `refines`, `introduces` and `unknown` withhold it, and the reason goes in `StaticResult.withheld`. The algebraic layer always reports `unknown`, because normalisation moves the operations; for it, a pair whose syntax cannot fail (`static.cannot_fail`: no arithmetic, cast, scalar subquery or SUM) is treated as `none`.
 3. **FLOAT64 sums.** The algebraic layer reads `SUM` as real arithmetic, so it regroups partial sums, and FLOAT64 addition is not associative (`1e16 + 1 + 1 + 1` is not `(1e16 + 1) + (1 + 1)`). The layer is skipped for any pair with a `SUM` whose input may be FLOAT64: a FLOAT64 column, a column of unknown type, a decimal literal, a division, and the order-sensitive aggregates (`AVG`, `STDDEV`, `VARIANCE`, `CORR`, `COVAR`). An alias is followed to the expression it names. The SMT layer still runs on such pairs.
 4. **A layer that raises proves nothing.**
@@ -54,9 +54,15 @@ The others are disclosures: result column types are not compared (confirm schema
 
 ## How it is checked
 
-- **Ported tests** (`tests/ported/`): 139 files, 3,098 test cases, all passing with no extra engine installed. They are the upstream tests with the ones that replay a witness database on another engine removed, because that is what they were for; 97 upstream files had no test left or read files from the upstream repository. Replaying those witnesses on the emulator is a follow-up, and would be the strongest soundness guard to add.
+- **Ported tests** (`tests/ported/`): 139 files, 3,098 test cases, all passing with no extra engine installed. They are the upstream tests with the ones that replay a witness database on another engine removed, because that is what they were for; 97 upstream files had no test left or read files from the upstream repository. The removed witness tests are replaced by the proof audit below, which reaches the same pairs through the prover call and checks them on the emulator.
+- **Proof audit:** [evals/proof-audit.md](evals/proof-audit.md): every pair the upstream tests give their provers (1,186), proved by the port and run on the emulator. 411 proved, 0 unexplained refutations; it found one false proof (identical text, nondeterministic query) and two emulator bugs.
+- **Held-out set:** [evals/heldout.md](evals/heldout.md): 63 pairs frozen before the layers ran on them. 28 of 39 equivalent proved, 20 of 24 different refuted (23 of 24 without the trust guard), 0 false proofs.
 - **False-proof detector:** `tools/run_pairs_eval.py` runs every pair the layers prove on the seeded databases of the emulator. A proved pair the emulator refutes is `PROOF_REFUTED`, a proved pair labelled different is `FALSE_PROOF`, and the script exits 1 on either. See [evals/pairs.md](evals/pairs.md) for the scores.
 - **What the detector cannot see:** a pair whose difference needs data the generator rarely draws. The FLOAT64 regrouping false proof was not found by 8 random databases; the label found it.
+
+## Known: run the suite in parallel
+
+`pytest` is configured with `-n auto` (pytest-xdist, in the `dev` extra). Run serially (`-p no:xdist`), the last nonlinear NUMERIC refutation in `tests/ported/test_smt_numeric.py` (`..._reference_arithmetic_agrees_with[3]`) can hit its 8 second solver limit and fail: it finishes within a second of the limit, and in one long process the shared Z3 context has grown with every earlier test. Under xdist it passes (checked on three runs). Resetting the Z3 context between tests breaks the module-level terms the tests share, so it is not done. The cause is a solver time limit near its edge, not a wrong answer; if it fails on your machine, raise `timeout_ms` for that test or run it alone.
 
 ## Limits
 

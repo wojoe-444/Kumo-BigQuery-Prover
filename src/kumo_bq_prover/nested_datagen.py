@@ -55,6 +55,8 @@ _NUMBERS = {"int": ["0", "1", "2", "10", "25"], "float": ["0", "0.5", "1.5", "10
 
 def _parses(flavour: str, text: str) -> bool:
     try:
+        if flavour in ("int", "float") and text != text.strip():
+            return False  # the emulator, unlike BigQuery, does not trim before it casts
         if flavour == "int":
             int(text)
         elif flavour == "float":

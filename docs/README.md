@@ -13,4 +13,4 @@
 - [evals/unsafe-rewrites.md](evals/unsafe-rewrites.md): 560 pairs of rewrites that look valid (NOT IN with NULLs, COUNT, join duplicates, outer-join predicates), with the labels the run decided.
 - [evals/jaffle-shop.md](evals/jaffle-shop.md): 15 refactors of a five-model dbt project, built as pipelines on the emulator.
 - [emulator-gaps.md](emulator-gaps.md): where the emulator disagrees with the reference, what the oracle does about it, and the residual risk.
-- [evals/spider2.md](evals/spider2.md): pairs generated from the Spider 2.0 BigQuery gold queries (rewrites and mutations), the data generator for nested types, scores, and what blocks the rest.
+- [evals/spider2.md](evals/spider2.md): pairs generated from the Spider 2.0 BigQuery gold queries (rewrites and mutations), the data generators for nested types (random, and one that satisfies each query's own filters), scores, and what blocks the rest.

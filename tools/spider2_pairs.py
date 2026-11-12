@@ -39,13 +39,13 @@ def _alarm(*_):
 
 
 def work(task: tuple) -> dict:
-    case_id, databases, max_mutations = task
+    case_id, databases, max_mutations, filtered_share = task
     started = time.time()
     signal.signal(signal.SIGALRM, _alarm)
     signal.alarm(QUERY_DEADLINE)
     try:
         with running_emulator() as client:
-            run = spider2.run_query(client, case_id, databases=databases, max_mutations=max_mutations)
+            run = spider2.run_query(client, case_id, databases=databases, max_mutations=max_mutations, filtered_share=filtered_share)
     except _Deadline:
         run = spider2.QueryRun(case_id, "timeout", f"over {QUERY_DEADLINE} s")
     except Exception as error:  # noqa: BLE001
@@ -54,7 +54,7 @@ def work(task: tuple) -> dict:
         signal.alarm(0)
     return {
         "case_id": run.case_id, "status": run.status, "reason": run.reason, "databases": run.databases,
-        "databases_nonempty": run.databases_nonempty, "databases_failed": run.databases_failed, "base_error": run.base_error, "pairs": run.pairs, "seconds": round(time.time() - started, 1),
+        "databases_nonempty": run.databases_nonempty, "databases_nonempty_filtered": run.databases_nonempty_filtered, "builder": run.builder, "databases_failed": run.databases_failed, "base_error": run.base_error, "pairs": run.pairs, "seconds": round(time.time() - started, 1),
     }
 
 
@@ -64,13 +64,14 @@ def main() -> int:
     parser.add_argument("--ids", nargs="*", help="only these case ids")
     parser.add_argument("--databases", type=int, default=20, help="random databases per query")
     parser.add_argument("--max-mutations", type=int, default=8)
+    parser.add_argument("--filtered-share", type=float, default=0.75, help="share of the databases built to satisfy the query's own filters (the rest are plain random)")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--no-write", action="store_true", help="print the summary, write nothing")
     args = parser.parse_args()
     cases = [c["id"] for c in spider2.manifest() if args.split == "all" or spider2.split_of(c["id"]) == args.split]
     if args.ids:
         cases = [c for c in cases if c in args.ids]
-    tasks = [(c, args.databases, args.max_mutations) for c in cases]
+    tasks = [(c, args.databases, args.max_mutations, args.filtered_share) for c in cases]
     with multiprocessing.Pool(args.workers) as pool:
         results = []
         for result in pool.imap_unordered(work, tasks):
@@ -105,7 +106,7 @@ def main() -> int:
         out = ROOT / "benchmarks" / "pairs" / f"spider2-bigquery-{args.split}.jsonl"
         out.write_text("".join(json.dumps(p, sort_keys=True) + "\n" for p in pairs))
         (ROOT / "benchmarks" / "results" / f"spider2-pairs-{args.split}.json").write_text(json.dumps({**summary, "queries_detail": [
-            {k: r[k] for k in ("case_id", "status", "reason", "databases_nonempty", "databases_failed", "base_error", "seconds")} for r in results]}, indent=1))
+            {k: r[k] for k in ("case_id", "status", "reason", "databases_nonempty", "databases_nonempty_filtered", "databases_failed", "base_error", "builder", "seconds")} for r in results]}, indent=1))
     return 1 if wrong or false_proofs else 0
 
 

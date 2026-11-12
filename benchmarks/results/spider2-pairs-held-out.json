@@ -5,19 +5,19 @@
   "ok": 23,
   "analysis-error": 7
  },
- "queries_left_empty_on_every_database": 10,
+ "queries_left_empty_on_every_database": 1,
  "pairs": 311,
  "pairs_by_kind_and_oracle": {
-  "mutation/agreed": 96,
+  "mutation/agreed": 48,
   "mutation/not-run": 5,
-  "mutation/refuted": 25,
-  "mutation/untrusted": 58,
+  "mutation/refuted": 27,
+  "mutation/untrusted": 104,
   "rewrite/agreed": 127
  },
  "labels": {
   "equivalent": 127,
-  "unlabelled": 159,
-  "not_equivalent": 25
+  "unlabelled": 157,
+  "not_equivalent": 27
  },
  "rewrite_refuted": [],
  "false_proofs": [],
@@ -45,54 +45,111 @@
    "case_id": "bq001",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
-   "databases_failed": 19,
+   "databases_nonempty": 15,
+   "databases_nonempty_filtered": 15,
+   "databases_failed": 5,
    "base_error": "failed to scan rows: error parsing [Ab] with format [%Y%m%d]: could not parse year: leading character is not a digit",
-   "seconds": 21.1
+   "builder": {
+    "anchors": 5,
+    "variables": 10,
+    "components": 7,
+    "components_solved": 7,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 39.1
   },
   {
    "case_id": "bq004",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
+   "databases_nonempty": 13,
+   "databases_nonempty_filtered": 13,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 28.2
+   "builder": {
+    "anchors": 4,
+    "variables": 6,
+    "components": 4,
+    "components_solved": 4,
+    "atoms_dropped": 0,
+    "atoms_skipped": 1,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 29.0
   },
   {
    "case_id": "bq010",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 19,
+   "databases_nonempty": 20,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 32.9
+   "builder": {
+    "anchors": 8,
+    "variables": 6,
+    "components": 5,
+    "components_solved": 5,
+    "atoms_dropped": 0,
+    "atoms_skipped": 3,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 34.1
   },
   {
    "case_id": "bq021",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
+   "databases_nonempty": 15,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 53.6
+   "builder": {
+    "anchors": 2,
+    "variables": 14,
+    "components": 7,
+    "components_solved": 7,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 56.5
   },
   {
    "case_id": "bq039",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
+   "databases_nonempty": 15,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 52.2
+   "builder": {
+    "anchors": 3,
+    "variables": 13,
+    "components": 10,
+    "components_solved": 10,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 55.1
   },
   {
    "case_id": "bq074",
    "status": "analysis-error",
    "reason": "Unrecognized name: geo_id [at 1:118]",
    "databases_nonempty": 0,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
+   "builder": {},
    "seconds": 0.6
   },
   {
@@ -100,17 +157,21 @@
    "status": "analysis-error",
    "reason": "Column name start_date is ambiguous [at 1:524]",
    "databases_nonempty": 0,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 1.5
+   "builder": {},
+   "seconds": 1.4
   },
   {
    "case_id": "bq098",
    "status": "analysis-error",
    "reason": "failed to parse statements: failed to parse statement: Syntax error: Expected ",
    "databases_nonempty": 0,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
+   "builder": {},
    "seconds": 0.3
   },
   {
@@ -118,62 +179,121 @@
    "status": "analysis-error",
    "reason": "Field name SYMBOL does not exist in STRUCT\\u003cConsequence STRING\\u003e [at 1:268]",
    "databases_nonempty": 0,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
+   "builder": {},
    "seconds": 0.4
   },
   {
    "case_id": "bq110",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 1,
+   "databases_nonempty": 16,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 37.2
+   "builder": {
+    "anchors": 2,
+    "variables": 6,
+    "components": 5,
+    "components_solved": 5,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 36.4
   },
   {
    "case_id": "bq112",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 20,
-   "databases_failed": 0,
-   "base_error": "",
-   "seconds": 72.7
+   "databases_nonempty": 19,
+   "databases_nonempty_filtered": 14,
+   "databases_failed": 1,
+   "base_error": "failed to scan rows: zero divided error ( -52.000000 / 0 )",
+   "builder": {
+    "anchors": 10,
+    "variables": 20,
+    "components": 8,
+    "components_solved": 8,
+    "atoms_dropped": 0,
+    "atoms_skipped": 6,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 68.5
   },
   {
    "case_id": "bq114",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
+   "databases_nonempty": 15,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 42.6
+   "builder": {
+    "anchors": 2,
+    "variables": 9,
+    "components": 7,
+    "components_solved": 7,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 41.8
   },
   {
    "case_id": "bq126",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 1,
+   "databases_nonempty": 15,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 44.7
+   "builder": {
+    "anchors": 2,
+    "variables": 6,
+    "components": 5,
+    "components_solved": 5,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 45.2
   },
   {
    "case_id": "bq143",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
+   "databases_nonempty": 3,
+   "databases_nonempty_filtered": 3,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 69.2
+   "builder": {
+    "anchors": 4,
+    "variables": 11,
+    "components": 5,
+    "components_solved": 5,
+    "atoms_dropped": 0,
+    "atoms_skipped": 1,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 68.9
   },
   {
    "case_id": "bq161",
    "status": "analysis-error",
    "reason": "Unrecognized name: ParticipantBarcode [at 1:286]",
    "databases_nonempty": 0,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
+   "builder": {},
    "seconds": 0.5
   },
   {
@@ -181,135 +301,282 @@
    "status": "ok",
    "reason": "",
    "databases_nonempty": 20,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 39.2
+   "builder": {
+    "anchors": 6,
+    "variables": 0,
+    "components": 0,
+    "components_solved": 0,
+    "atoms_dropped": 0,
+    "atoms_skipped": 1,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 37.3
   },
   {
    "case_id": "bq232",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
+   "databases_nonempty": 15,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 37.7
+   "builder": {
+    "anchors": 1,
+    "variables": 3,
+    "components": 3,
+    "components_solved": 3,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 38.0
   },
   {
    "case_id": "bq281",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
+   "databases_nonempty": 15,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 30.9
+   "builder": {
+    "anchors": 1,
+    "variables": 5,
+    "components": 5,
+    "components_solved": 5,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 32.3
   },
   {
    "case_id": "bq285",
    "status": "analysis-error",
    "reason": "Column fdic_certificate_number in USING clause not found on left side of join [at 1:339]",
    "databases_nonempty": 0,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 0.7
+   "builder": {},
+   "seconds": 0.8
   },
   {
    "case_id": "bq302",
    "status": "ok",
    "reason": "",
    "databases_nonempty": 0,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 39.6
+   "builder": {
+    "anchors": 2,
+    "variables": 3,
+    "components": 2,
+    "components_solved": 2,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 38.8
   },
   {
    "case_id": "bq327",
    "status": "ok",
    "reason": "",
    "databases_nonempty": 20,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 50.9
+   "builder": {
+    "anchors": 2,
+    "variables": 4,
+    "components": 3,
+    "components_solved": 3,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 52.1
   },
   {
    "case_id": "bq338",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 1,
+   "databases_nonempty": 15,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 57.7
+   "builder": {
+    "anchors": 4,
+    "variables": 10,
+    "components": 6,
+    "components_solved": 6,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 60.7
   },
   {
    "case_id": "bq355",
    "status": "analysis-error",
    "reason": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
    "databases_nonempty": 0,
+   "databases_nonempty_filtered": 0,
    "databases_failed": 0,
    "base_error": "",
+   "builder": {},
    "seconds": 0.8
   },
   {
    "case_id": "bq394",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 19,
+   "databases_nonempty": 20,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 41.4
+   "builder": {
+    "anchors": 1,
+    "variables": 5,
+    "components": 5,
+    "components_solved": 5,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 41.2
   },
   {
    "case_id": "bq396",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 12,
+   "databases_nonempty": 19,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 65.7
+   "builder": {
+    "anchors": 1,
+    "variables": 2,
+    "components": 2,
+    "components_solved": 2,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 63.7
   },
   {
    "case_id": "bq424",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 11,
+   "databases_nonempty": 18,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 41.8
+   "builder": {
+    "anchors": 2,
+    "variables": 4,
+    "components": 3,
+    "components_solved": 3,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 43.7
   },
   {
    "case_id": "ga001",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 0,
+   "databases_nonempty": 14,
+   "databases_nonempty_filtered": 14,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 35.7
+   "builder": {
+    "anchors": 4,
+    "variables": 8,
+    "components": 6,
+    "components_solved": 6,
+    "atoms_dropped": 0,
+    "atoms_skipped": 1,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 38.6
   },
   {
    "case_id": "ga008",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 9,
+   "databases_nonempty": 8,
+   "databases_nonempty_filtered": 6,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 31.7
+   "builder": {
+    "anchors": 1,
+    "variables": 1,
+    "components": 1,
+    "components_solved": 1,
+    "atoms_dropped": 0,
+    "atoms_skipped": 1,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 31.9
   },
   {
    "case_id": "ga012",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 13,
-   "databases_failed": 3,
-   "base_error": "failed to scan rows: zero divided error ( -2.000000 / 0 )",
-   "seconds": 17.0
+   "databases_nonempty": 11,
+   "databases_nonempty_filtered": 7,
+   "databases_failed": 7,
+   "base_error": "failed to scan rows: zero divided error ( -1.000000 / 0 )",
+   "builder": {
+    "anchors": 4,
+    "variables": 4,
+    "components": 3,
+    "components_solved": 3,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 14.6
   },
   {
    "case_id": "ga017",
    "status": "ok",
    "reason": "",
-   "databases_nonempty": 9,
+   "databases_nonempty": 17,
+   "databases_nonempty_filtered": 15,
    "databases_failed": 0,
    "base_error": "",
-   "seconds": 42.4
+   "builder": {
+    "anchors": 2,
+    "variables": 2,
+    "components": 2,
+    "components_solved": 2,
+    "atoms_dropped": 0,
+    "atoms_skipped": 0,
+    "count_thresholds": 0,
+    "scenarios": 3
+   },
+   "seconds": 44.4
   }
  ]
 }

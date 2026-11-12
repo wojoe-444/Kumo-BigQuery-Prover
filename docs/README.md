@@ -10,3 +10,4 @@
 - [evals/proof-audit.md](evals/proof-audit.md): every pair the upstream tests give their provers, proved by the ported layers and checked on the emulator.
 - [evals/googlesql-compliance.md](evals/googlesql-compliance.md): Google's GoogleSQL compliance cases run on the emulator, with scores for the development and held-out files.
 - [emulator-gaps.md](emulator-gaps.md): where the emulator disagrees with the reference, what the oracle does about it, and the residual risk.
+- [evals/spider2.md](evals/spider2.md): pairs generated from the Spider 2.0 BigQuery gold queries (rewrites and mutations), the data generator for nested types, scores, and what blocks the rest.

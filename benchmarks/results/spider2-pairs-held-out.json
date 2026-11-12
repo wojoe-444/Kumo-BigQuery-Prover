@@ -1,0 +1,315 @@
+{
+ "split": "held-out",
+ "queries": 30,
+ "queries_by_status": {
+  "ok": 23,
+  "analysis-error": 7
+ },
+ "queries_left_empty_on_every_database": 10,
+ "pairs": 311,
+ "pairs_by_kind_and_oracle": {
+  "mutation/agreed": 96,
+  "mutation/not-run": 5,
+  "mutation/refuted": 25,
+  "mutation/untrusted": 58,
+  "rewrite/agreed": 127
+ },
+ "labels": {
+  "equivalent": 127,
+  "unlabelled": 159,
+  "not_equivalent": 25
+ },
+ "rewrite_refuted": [],
+ "false_proofs": [],
+ "static_verdict_on_rewrites": {
+  "unknown": 70,
+  "proven": 57
+ },
+ "static_proved_by_layer": {
+  "structural": 17,
+  "smt": 19,
+  "algebraic": 33
+ },
+ "databases_per_query": 20,
+ "does_not_run": {
+  "analysis-error: Unrecognized name: geo_id [at 1:118]": 1,
+  "analysis-error: Column name start_date is ambiguous [at 1:524]": 1,
+  "analysis-error: failed to parse statements: failed to parse statement: Syntax error: Expected ": 1,
+  "analysis-error: Field name SYMBOL does not exist in STRUCT\\u003cConsequence STRING\\u003e [at 1:268]": 1,
+  "analysis-error: Unrecognized name: ParticipantBarcode [at 1:286]": 1,
+  "analysis-error: Column fdic_certificate_number in USING clause not found on left side of join [at 1:339]": 1,
+  "analysis-error: failed to scan rows: zero divided error ( 0.000000 / 0 )": 1
+ },
+ "queries_detail": [
+  {
+   "case_id": "bq001",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 19,
+   "base_error": "failed to scan rows: error parsing [Ab] with format [%Y%m%d]: could not parse year: leading character is not a digit",
+   "seconds": 21.1
+  },
+  {
+   "case_id": "bq004",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 28.2
+  },
+  {
+   "case_id": "bq010",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 19,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 32.9
+  },
+  {
+   "case_id": "bq021",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 53.6
+  },
+  {
+   "case_id": "bq039",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 52.2
+  },
+  {
+   "case_id": "bq074",
+   "status": "analysis-error",
+   "reason": "Unrecognized name: geo_id [at 1:118]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.6
+  },
+  {
+   "case_id": "bq081",
+   "status": "analysis-error",
+   "reason": "Column name start_date is ambiguous [at 1:524]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 1.5
+  },
+  {
+   "case_id": "bq098",
+   "status": "analysis-error",
+   "reason": "failed to parse statements: failed to parse statement: Syntax error: Expected ",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.3
+  },
+  {
+   "case_id": "bq102",
+   "status": "analysis-error",
+   "reason": "Field name SYMBOL does not exist in STRUCT\\u003cConsequence STRING\\u003e [at 1:268]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.4
+  },
+  {
+   "case_id": "bq110",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 1,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 37.2
+  },
+  {
+   "case_id": "bq112",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 72.7
+  },
+  {
+   "case_id": "bq114",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 42.6
+  },
+  {
+   "case_id": "bq126",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 1,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 44.7
+  },
+  {
+   "case_id": "bq143",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 69.2
+  },
+  {
+   "case_id": "bq161",
+   "status": "analysis-error",
+   "reason": "Unrecognized name: ParticipantBarcode [at 1:286]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.5
+  },
+  {
+   "case_id": "bq204",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 39.2
+  },
+  {
+   "case_id": "bq232",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 37.7
+  },
+  {
+   "case_id": "bq281",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 30.9
+  },
+  {
+   "case_id": "bq285",
+   "status": "analysis-error",
+   "reason": "Column fdic_certificate_number in USING clause not found on left side of join [at 1:339]",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.7
+  },
+  {
+   "case_id": "bq302",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 39.6
+  },
+  {
+   "case_id": "bq327",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 20,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 50.9
+  },
+  {
+   "case_id": "bq338",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 1,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 57.7
+  },
+  {
+   "case_id": "bq355",
+   "status": "analysis-error",
+   "reason": "failed to scan rows: zero divided error ( 0.000000 / 0 )",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 0.8
+  },
+  {
+   "case_id": "bq394",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 19,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 41.4
+  },
+  {
+   "case_id": "bq396",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 12,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 65.7
+  },
+  {
+   "case_id": "bq424",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 11,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 41.8
+  },
+  {
+   "case_id": "ga001",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 0,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 35.7
+  },
+  {
+   "case_id": "ga008",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 9,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 31.7
+  },
+  {
+   "case_id": "ga012",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 13,
+   "databases_failed": 3,
+   "base_error": "failed to scan rows: zero divided error ( -2.000000 / 0 )",
+   "seconds": 17.0
+  },
+  {
+   "case_id": "ga017",
+   "status": "ok",
+   "reason": "",
+   "databases_nonempty": 9,
+   "databases_failed": 0,
+   "base_error": "",
+   "seconds": 42.4
+  }
+ ]
+}

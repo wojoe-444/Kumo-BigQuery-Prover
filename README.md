@@ -34,6 +34,6 @@ python -m pytest -m emulator                    # live tests, need the binary
 python tools/run_oracle_eval.py                 # score the synthetic corpus
 ```
 
-Which evals to improve this against, in order: [docs/hillclimb-evals.md](docs/hillclimb-evals.md). Pair corpora: `python tools/run_pairs_eval.py documented-rewrites`, `numeric-traps` or `heldout-2026-11-12` (never tune on the last). Proof audit: `python tools/audit_proofs.py benchmarks/audit/upstream-test-pairs.jsonl`. Compliance cases on the emulator: `python tools/run_compliance.py --split all --json RESULTS.json`, then `python tools/compliance_gaps.py RESULTS.json` ([docs/evals/googlesql-compliance.md](docs/evals/googlesql-compliance.md)).
+Which evals to improve this against, in order: [docs/hillclimb-evals.md](docs/hillclimb-evals.md). Pair corpora: `python tools/run_pairs_eval.py documented-rewrites`, `numeric-traps` or `heldout-2026-11-12` (never tune on the last). Proof audit: `python tools/audit_proofs.py benchmarks/audit/upstream-test-pairs.jsonl`. Pairs from the Spider 2.0 gold queries: `python tools/spider2_pairs.py --split dev` ([docs/evals/spider2.md](docs/evals/spider2.md)). Compliance cases on the emulator: `python tools/run_compliance.py --split all --json RESULTS.json`, then `python tools/compliance_gaps.py RESULTS.json` ([docs/evals/googlesql-compliance.md](docs/evals/googlesql-compliance.md)).
 
 Docs: [docs/README.md](docs/README.md).

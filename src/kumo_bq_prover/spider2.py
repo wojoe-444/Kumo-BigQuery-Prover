@@ -26,7 +26,7 @@ import json
 import pathlib
 from dataclasses import dataclass, field
 
-from . import nested_datagen, pairgen
+from . import filter_data, nested_datagen, pairgen
 from .emulator import Client, EmulatorUnavailable, QueryError
 from .harvest import harvest
 from .schema_infer import Prepared, Unsupported, prepare, type_sql
@@ -101,6 +101,8 @@ class QueryRun:
     databases_nonempty: int = 0  # databases on which the original returned at least one row
     databases_failed: int = 0  # databases on which the original itself raised an error
     base_error: str = ""
+    builder: dict = field(default_factory=dict)  # what the filter-satisfying data builder found (see filter_data)
+    databases_nonempty_filtered: int = 0  # of databases_nonempty, those built by the filter-satisfying builder
     pairs: list[dict] = field(default_factory=list)
 
 
@@ -110,7 +112,10 @@ def run_query(
     sql: str | None = None,
     databases: int = 20,
     max_mutations: int = 8,
+    filtered_share: float = 0.75,
 ) -> QueryRun:
+    """``filtered_share`` of the databases come from ``filter_data`` (rows that satisfy the query's own filters,
+    joins and UNNESTs); the rest are the plain random databases, which keep their variety."""
     sql = sql if sql is not None else gold_sql(case_id)
     try:
         prepared = prepare(sql)
@@ -128,9 +133,26 @@ def run_query(
     flavours = prepared.schema.flavours()
     variants = pairgen.variants(prepared.tree, max_mutations=max_mutations)
     run = QueryRun(case_id, "ok", sql=prepared.sql, schema=schema_json(schema), databases=databases)
+    plan = None
+    if filtered_share > 0:
+        try:
+            plan = filter_data.plan(client, prepared.tree, schema, flavours=flavours)
+        except EmulatorUnavailable as error:
+            run.status, run.reason = "no-data-run", f"emulator unavailable: {error}"
+            return run
+        except Exception as error:  # noqa: BLE001 - the builder is an aid: without it the random databases still run
+            run.builder = {"error": f"{type(error).__name__}: {str(error)[:100]}"}
+        if plan is not None:
+            run.builder = plan.summary()
+            if not plan.solvable():
+                plan = None
     stats = [{"compared": 0, "differ": 0, "errors": 0, "witness": None, "untrusted": {}} for _ in variants]
     for seed in range(databases):
-        setup = nested_datagen.random_database(schema, seed, extra=extra, classes=classes, exact=exact, flavours=flavours)
+        filtered = plan is not None and int((seed + 1) * filtered_share + 1e-9) > int(seed * filtered_share + 1e-9)
+        if filtered:
+            setup = plan.database(seed, extra=extra, classes=classes, exact=exact, flavours=flavours)
+        else:
+            setup = nested_datagen.random_database(schema, seed, extra=extra, classes=classes, exact=exact, flavours=flavours)
         try:
             with client.scratch_dataset() as dataset:
                 for statement in setup:
@@ -142,6 +164,7 @@ def run_query(
                     continue
                 if base.rows:
                     run.databases_nonempty += 1
+                    run.databases_nonempty_filtered += bool(filtered)
                 for stat, variant in zip(stats, variants):
                     other, error = _try_run(client, dataset, variant.sql)
                     if other is None:

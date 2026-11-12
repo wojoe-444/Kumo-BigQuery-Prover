@@ -41,4 +41,4 @@ See [evals/pairs.md](evals/pairs.md) for the scores, the emulator gaps found and
 1. Raise numeric traps and documented rewrites. Done first: data seeded with each pair's own constants ([evals/pairs.md](evals/pairs.md)). Proof side done ([ported-layers.md](ported-layers.md)). Next: decide how to label float SUM order.
 2. ~~Run the compliance fixture on the emulator and write the gap list.~~ Done: [evals/googlesql-compliance.md](evals/googlesql-compliance.md), [emulator-gaps.md](emulator-gaps.md).
 3. Pipeline equivalence and refutation on the emulator.
-4. Spider 2.0 pair generator. Done first version ([evals/spider2.md](evals/spider2.md)); next: data that makes more of the queries return rows.
+4. Spider 2.0 pair generator. Done ([evals/spider2.md](evals/spider2.md)), including data that makes the queries return rows (75 of 80 development queries); next: recover the mutation differences the trust guard withholds (265 development).

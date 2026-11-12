@@ -4,11 +4,14 @@
 For every case the two queries run on N seeded random databases (plus the
 case's own witness rows when it has them). Outcomes:
 
-  equivalent label      ok | WRONG (refuted: an emulator bug or a bad label) | emulator_error
-  not_equivalent label  caught (refuted) | missed | emulator_error
+  equivalent label      proved | ok | WRONG (refuted: an emulator bug or a bad label) | emulator_error
+                        PROOF_REFUTED (proved by a static layer and refuted: a false proof until shown otherwise)
+  not_equivalent label  caught (refuted) | missed | emulator_error | FALSE_PROOF (a static layer proved it)
+  either label          assumed (proved, but the proof lists an assumption the case names in violates/discharged: counted as unknown)
   any other label       unscored
 
-The script exits 1 when any case is WRONG. Emulator rejections are grouped by
+Every proved pair also runs on the databases: the emulator is the false-proof detector. The script exits 1 when
+any case is WRONG, PROOF_REFUTED or FALSE_PROOF. Emulator rejections are grouped by
 message at the end: that list is the emulator's gap list.
 """
 
@@ -28,7 +31,7 @@ from kumo_bq_prover.datagen import fixed_database, random_database  # noqa: E402
 from kumo_bq_prover.emulator import running_emulator  # noqa: E402
 from kumo_bq_prover.harvest import harvest  # noqa: E402
 from kumo_bq_prover.oracle import compare  # noqa: E402
-from kumo_bq_prover.static import prove_static  # noqa: E402
+from kumo_bq_prover.static import LAYERS, prove_static_detailed  # noqa: E402
 from kumo_bq_prover.verdict import Verdict  # noqa: E402
 
 RECYCLE = 6
@@ -51,12 +54,12 @@ def classify_error(reason: str) -> str:
     return (message.group(1) if message else text[:160]).replace("\\", "")
 
 
-def run_case(client, case: dict, databases: int, use_harvest: bool = True, specials: bool = False) -> dict:
+def run_case(client, case: dict, databases: int, use_harvest: bool = True, specials: bool = False, layers: tuple[str, ...] = LAYERS) -> dict:
     schema = schema_of(case)
     label = case["label"]
     if label not in ("equivalent", "not_equivalent"):
         return {"id": case["id"], "label": label, "outcome": "unscored"}
-    static = prove_static(case["left"], case["right"]) is Verdict.PROVEN
+    static = prove_static_detailed(case["left"], case["right"], schema_of(case), layers=layers)
     extra = harvest(case["left"], case["right"], schema) if use_harvest else None
     setups = [random_database(schema, seed, extra=extra, specials=specials) for seed in range(databases)]
     witness = case.get("witness")
@@ -72,14 +75,27 @@ def run_case(client, case: dict, databases: int, use_harvest: bool = True, speci
             errors[classify_error(result.reason)] += 1
         else:
             agreed += 1
+    proved = static.verdict is Verdict.PROVEN
+    # A proof that lists an assumption the case violates (or says does not apply) is disclosed, not clean: it is not
+    # counted as a proof and is not a false proof. The corpus names those assumptions in "violates" / "discharged".
+    named = list(case.get("violates") or []) + list(case.get("discharged") or [])
+    assumed = proved and any(a.startswith(n) for a in static.assumptions for n in named)
     if label == "equivalent":
-        outcome = "WRONG" if refuted_on else ("emulator_error" if not agreed else "ok")
+        if assumed:
+            outcome = "PROOF_REFUTED" if refuted_on else "assumed"
+        elif proved:
+            outcome = "PROOF_REFUTED" if refuted_on else "proved"
+        else:
+            outcome = "WRONG" if refuted_on else ("emulator_error" if not agreed else "ok")
     else:
-        outcome = "caught" if refuted_on else ("emulator_error" if not agreed else "missed")
-    if static and label == "equivalent" and not refuted_on:
-        outcome = "ok"
+        if assumed:
+            outcome = "assumed"
+        elif proved:
+            outcome = "FALSE_PROOF"
+        else:
+            outcome = "caught" if refuted_on else ("emulator_error" if not agreed else "missed")
     return {
-        "id": case["id"], "label": label, "outcome": outcome, "static_proof": static,
+        "id": case["id"], "label": label, "outcome": outcome, "proof_layer": static.layer if proved else None, "assumptions": list(static.assumptions), "error_report": static.errors, "withheld": static.withheld or None,
         "databases_agreed": agreed, "errors": dict(errors), "counterexample": refuted_on,
     }
 
@@ -92,7 +108,9 @@ def main() -> int:
     parser.add_argument("--no-harvest", action="store_true", help="seed data from the base pools only (the baseline)")
     parser.add_argument("--specials", action="store_true", help="add NaN, infinities, -0.0 and scale-limit NUMERIC values to the pools")
     parser.add_argument("--only", help="run only case ids containing this text")
+    parser.add_argument("--layers", default=",".join(LAYERS), help="comma-separated static layers to use (identical,structural,algebraic,smt); 'none' for the oracle alone")
     args = parser.parse_args()
+    layers = tuple(x for x in args.layers.split(",") if x and x != "none")
     cases = [json.loads(line) for line in (ROOT / "benchmarks/pairs" / f"{args.corpus}.jsonl").read_text().splitlines() if line]
     if args.only:
         cases = [c for c in cases if args.only in c["id"]]
@@ -102,7 +120,7 @@ def main() -> int:
     for start in range(0, len(cases), RECYCLE):
         with running_emulator() as client:
             for case in cases[start : start + RECYCLE]:
-                outcome = run_case(client, case, args.databases, use_harvest=not args.no_harvest, specials=args.specials)
+                outcome = run_case(client, case, args.databases, use_harvest=not args.no_harvest, specials=args.specials, layers=layers)
                 outcomes.append(outcome)
                 note = next(iter(outcome.get("errors", {})), "")
                 print(f"{outcome['outcome']:15} {outcome['label']:15} {outcome['id']:32} {note[:70]}", flush=True)
@@ -116,7 +134,7 @@ def main() -> int:
         print(f"  gap in {n:3} cases: {message}")
     if args.json:
         pathlib.Path(args.json).write_text(json.dumps({"counts": {f"{a}/{b}": n for (a, b), n in counts.items()}, "gaps": dict(gaps), "cases": outcomes}, indent=1, default=str))
-    return 1 if any(o["outcome"] == "WRONG" for o in outcomes) else 0
+    return 1 if any(o["outcome"] in ("WRONG", "PROOF_REFUTED", "FALSE_PROOF") for o in outcomes) else 0
 
 
 if __name__ == "__main__":

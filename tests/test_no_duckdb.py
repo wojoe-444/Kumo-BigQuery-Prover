@@ -11,6 +11,6 @@ def test_no_duckdb_in_code_or_dependencies():
     files = [ROOT / "pyproject.toml"]
     files += (ROOT / "src").rglob("*.py")
     files += (ROOT / "tools").glob("*")
-    files += [p for p in (ROOT / "tests").glob("*.py") if p.name != pathlib.Path(__file__).name]
+    files += [p for p in (ROOT / "tests").rglob("*.py") if p.name != pathlib.Path(__file__).name]
     offenders = [str(p.relative_to(ROOT)) for p in files if p.is_file() and PATTERN.search(p.read_text())]
     assert not offenders, offenders

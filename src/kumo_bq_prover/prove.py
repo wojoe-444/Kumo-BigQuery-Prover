@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .emulator import Client
 from .oracle import OracleResult, compare
-from .static import prove_static
+from .static import prove_static_detailed
 from .verdict import Verdict
 
 
@@ -14,13 +14,16 @@ def prove_equivalent(
     setup: list[str] | None = None,
     client: Client | None = None,
     ordered: bool = False,
+    schema: dict[str, dict[str, str]] | None = None,
 ) -> OracleResult:
-    """PROVEN (static), REFUTED (emulator counterexample) or UNKNOWN.
+    """PROVEN (a static layer), REFUTED (emulator counterexample) or UNKNOWN.
 
-    ``client`` is optional: with no emulator the answer is the static one.
+    ``schema`` is ``{table: {column: type}}``; the static layers use it for column types. ``client`` is optional:
+    with no emulator the answer is the static one.
     """
-    if prove_static(left_sql, right_sql) is Verdict.PROVEN:
-        return OracleResult(Verdict.PROVEN, "identical after parsing")
+    static = prove_static_detailed(left_sql, right_sql, schema, ordered=ordered)
+    if static.verdict is Verdict.PROVEN:
+        return OracleResult(Verdict.PROVEN, f"{static.layer}: {static.reason}", assumptions=static.assumptions)
     if client is None:
-        return OracleResult(Verdict.UNKNOWN, "no static proof and no emulator given")
+        return OracleResult(Verdict.UNKNOWN, "no static proof and no emulator given" + (f" ({static.withheld})" if static.withheld else ""))
     return compare(client, left_sql, right_sql, setup=setup, ordered=ordered)
